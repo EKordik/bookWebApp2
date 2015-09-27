@@ -9,7 +9,7 @@ import java.util.Date;
 public class Author {
     private String authorName;
     private int authorId;
-    private Date creationDate;
+    private Date dateCreated;
 
     public String getAuthorName() {
         return authorName;
@@ -27,17 +27,17 @@ public class Author {
         this.authorId = authorId;
     }
 
-    public Date getCreationDate() {
-        return creationDate;
+    public Date getDateCreated() {
+        return dateCreated;
     }
 
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
+    public void setDateCreated(Date creationDate) {
+        this.dateCreated = creationDate;
     }
 
     @Override
     public String toString() {
-        return "Author{" + "authorName=" + authorName + ", authorId=" + authorId + ", creationDate=" + creationDate + '}';
+        return "Author{" + "authorName=" + authorName + ", authorId=" + authorId + ", creationDate=" + dateCreated + '}';
     }
     
     

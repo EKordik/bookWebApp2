@@ -8,7 +8,7 @@ import java.util.Map;
  *
  * @author emmakordik
  */
-public interface DatabaseAccessStrategy {
+public interface DatabaseStrategy {
 
     void closeConnection() throws SQLException;
 

@@ -9,7 +9,7 @@ import java.util.List;
  */
 public interface IAuthorDAO {
 
-    void deleteAuthorbyId(String primaryKeyColName, Object primaryKeyValue) throws ClassNotFoundException, SQLException;
+    void deleteAuthorbyId(String authorId) throws ClassNotFoundException, SQLException;
 
     List<Author> getAllAuthors() throws ClassNotFoundException, SQLException;
     

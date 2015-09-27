@@ -12,7 +12,7 @@ import java.util.Date;
  * @author emmakordik
  */
 public class AuthorDAO implements IAuthorDAO {
-    private DatabaseAccessStrategy db;
+    private DatabaseStrategy db;
     private String driverClass;
     private String url;
     private String userName;
@@ -22,9 +22,9 @@ public class AuthorDAO implements IAuthorDAO {
     private final static String ID_COL = "author_id";
     private final static String DATE_COL = "date_created";
     
-    public AuthorDAO(String driverClass, String url, 
+    public AuthorDAO(DatabaseStrategy db, String driverClass, String url, 
             String userName, String password){
-        db = new MySqlDb();
+        this.db = db;
         this.driverClass = driverClass;
         this.url= url;
         this.userName = userName;
@@ -51,7 +51,7 @@ public class AuthorDAO implements IAuthorDAO {
                 
                 obj = rawRecord.get("date_created");
                 Date creationDate = (obj == null) ? new Date() : (Date)rawRecord.get("date_created");
-                a.setCreationDate(creationDate);
+                a.setDateCreated(creationDate);
                 authors.add(a);
             }
             
@@ -62,11 +62,11 @@ public class AuthorDAO implements IAuthorDAO {
     }
     
     @Override
-    public void deleteAuthorbyId(String primaryKeyColName,
-            Object primaryKeyValue)throws ClassNotFoundException, SQLException{
+    public void deleteAuthorbyId(String author)throws ClassNotFoundException, SQLException, NumberFormatException{
+        int authorId = Integer.parseInt(author);
         db.openConnection(driverClass, url, userName, password);
         try{
-            db.deleteByPrimaryKey(TABLE_NAME, primaryKeyColName, primaryKeyValue);
+            db.deleteByPrimaryKey(TABLE_NAME, ID_COL, authorId);
         }finally{
             db.closeConnection();
         }
@@ -81,11 +81,19 @@ public class AuthorDAO implements IAuthorDAO {
         colNames.add(DATE_COL);
         
         colValues.add(author.getAuthorName());
-        colValues.add(stf.format(author.getCreationDate()));
+        
+        if(author.getDateCreated() != null){
+            colValues.add(stf.format(author.getDateCreated()));
+        }else{
+            colValues.add(stf.format(new Date()));
+        }
         
         db.openConnection(driverClass, url, userName, password);
-        db.insertRecord(TABLE_NAME, colNames, colValues);
-        db.closeConnection();
+        try{
+            db.insertRecord(TABLE_NAME, colNames, colValues);
+        }finally{
+            db.closeConnection();
+        }
     }
     
     public void updateAuthor(Author author) throws ClassNotFoundException, SQLException{
@@ -95,22 +103,26 @@ public class AuthorDAO implements IAuthorDAO {
         colNames.add(DATE_COL);
         
         colValues.add(author.getAuthorName());
-        colValues.add(author.getCreationDate());
+        colValues.add(author.getDateCreated());
         
         db.openConnection(driverClass, url, userName, password);
+        try{
         db.updateRecord(TABLE_NAME, colNames, colValues, ID_COL, author.getAuthorId());
-        db.closeConnection();
+        }finally{
+            db.closeConnection();
+        }
+        
     }
     
     public static void main(String[] args) {
-        AuthorDAO author = new AuthorDAO("com.mysql.jdbc.Driver",
+        AuthorDAO author = new AuthorDAO(new MySqlDb(), "com.mysql.jdbc.Driver",
                 "jdbc:mysql://localhost:3306/book","root","admin");
             
         List<Author> records = new ArrayList<>();
         Author aa = new Author();
         aa.setAuthorId(10);
         aa.setAuthorName("Hans Christian Anderson");
-        aa.setCreationDate(new Date());
+        aa.setDateCreated(new Date());
         
         try{
             //author.deleteAuthorbyId("author_id", 7);

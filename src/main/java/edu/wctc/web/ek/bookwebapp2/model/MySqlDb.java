@@ -19,7 +19,7 @@ import java.util.Map;
  *
  * @author emmakordik
  */
-public class MySqlDb implements DatabaseAccessStrategy {
+public class MySqlDb implements DatabaseStrategy {
     private Connection conn;
     
     @Override
