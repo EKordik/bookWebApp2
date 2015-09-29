@@ -1,6 +1,7 @@
 package edu.wctc.web.ek.bookwebapp2.model;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.List;
 
 /**
@@ -13,7 +14,7 @@ public interface IAuthorDAO {
 
     List<Author> getAllAuthors() throws ClassNotFoundException, SQLException;
     
-    public abstract void saveAuthor(Author author) throws ClassNotFoundException, SQLException;
+    public abstract void saveAuthor(String authorName, String date)throws ClassNotFoundException, SQLException, ParseException;
     
     public void updateAuthor(Author author) throws ClassNotFoundException, SQLException;
 }

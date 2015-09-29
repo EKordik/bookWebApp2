@@ -8,6 +8,10 @@ import edu.wctc.web.ek.bookwebapp2.model.AuthorService;
 import edu.wctc.web.ek.bookwebapp2.model.DatabaseStrategy;
 import edu.wctc.web.ek.bookwebapp2.model.MySqlDb;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -32,7 +36,7 @@ public class AuthorController extends HttpServlet {
     private static final String NO_PARAM_ERR_MSG = "No request parameter identified";
     private static final String LIST_PAGE = "/listAuthors.jsp";
     private static final String LIST_ACTION = "list";
-    private static final String ADD_ACTION = "add";
+    private static final String ADD_ACTION = "insert";
     private static final String UPDATE_ACTION = "update";
     private static final String DELETE_ACTION = "delete";
     private static final String ACTION_PARAM = "action";
@@ -86,10 +90,28 @@ public class AuthorController extends HttpServlet {
                 destination = LIST_PAGE;
 
             } else if (action.equals(ADD_ACTION)) {
-                Author author = new Author();
+                String authorName=  request.getParameter("addName");
+                String date =request.getParameter("addDate");
+                
+                authService.saveAuthor(authorName, date);
+                
+                request.setAttribute("authors", getAuthors(authService));
                 
             } else if (action.equals(UPDATE_ACTION)) {
-                // coming soon
+                String authorName = request.getParameter("authorName");
+                String dateCreated = request.getParameter("date");
+                String authorId = request.getParameter("authorId");
+                
+                DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                Date date = format.parse(dateCreated);
+                
+                Author author = new Author(Integer.parseInt(authorId), authorName, date);
+                
+                authService.updateAuthor(author);
+                request.setAttribute("authors", getAuthors(authService));
+                
+                System.out.println("Ran");
+               
             } else if (action.equals(DELETE_ACTION)) {
                 String authorID = request.getParameter("deleteAuthor");
                 authService.deleteAuthor(authorID);
@@ -115,6 +137,9 @@ public class AuthorController extends HttpServlet {
         dispatcher.forward(request, response);
     }
     
+    private List<Author> getAuthors(AuthorService service) throws ClassNotFoundException, SQLException{
+        return service.getAllAuthors();      
+    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

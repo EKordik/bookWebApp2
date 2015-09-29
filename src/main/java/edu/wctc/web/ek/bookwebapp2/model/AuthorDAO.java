@@ -1,6 +1,7 @@
 package edu.wctc.web.ek.bookwebapp2.model;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +73,8 @@ public class AuthorDAO implements IAuthorDAO {
         }
     }
     
-    public void saveAuthor(Author author) throws ClassNotFoundException, SQLException{
+    public void saveAuthor(String authorName, String date) 
+            throws ClassNotFoundException, SQLException, ParseException{
         List<String> colNames = new ArrayList<>();
         List<Object> colValues = new ArrayList<>();
         SimpleDateFormat stf = new SimpleDateFormat("yyyy-MM-dd");
@@ -80,10 +82,10 @@ public class AuthorDAO implements IAuthorDAO {
         colNames.add(NAME_COL);
         colNames.add(DATE_COL);
         
-        colValues.add(author.getAuthorName());
+        colValues.add(authorName);
         
-        if(author.getDateCreated() != null){
-            colValues.add(stf.format(author.getDateCreated()));
+        if(date != null){
+            colValues.add(stf.parse(date));
         }else{
             colValues.add(stf.format(new Date()));
         }

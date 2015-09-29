@@ -11,6 +11,16 @@ public class Author {
     private int authorId;
     private Date dateCreated;
 
+    public Author() {
+    }
+
+    public Author(int authorId, String authorName, Date dateCreated) {
+        this.authorName = authorName;
+        this.authorId = authorId;
+        this.dateCreated = dateCreated;
+    }
+
+    
     public String getAuthorName() {
         return authorName;
     }

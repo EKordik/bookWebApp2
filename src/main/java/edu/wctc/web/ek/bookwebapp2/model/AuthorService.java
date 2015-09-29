@@ -1,6 +1,7 @@
 package edu.wctc.web.ek.bookwebapp2.model;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,8 +25,8 @@ public class AuthorService {
         authorStrategy.deleteAuthorbyId(authorId);
     }
     
-    public void saveAuthor(Author author) throws ClassNotFoundException, SQLException{
-        authorStrategy.saveAuthor(author);
+    public void saveAuthor(String authorName, String date) throws ClassNotFoundException, SQLException, ParseException{
+        authorStrategy.saveAuthor(authorName, date);
     }
     
     public void updateAuthor(Author author) throws ClassNotFoundException, SQLException{
