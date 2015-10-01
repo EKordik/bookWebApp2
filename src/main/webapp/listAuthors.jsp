@@ -30,7 +30,7 @@
                     <div class="fixed">
                         <ul>
                             <li>Delete Author</li>
-                            <li>Update Author</li>
+                            <li><a data-toggle="modal" href="#updateModal2">Update Author</a></li>
                             <li><a data-toggle="modal" href="#insertModal">Insert Author</a></li>
                         </ul>
                     </div>
@@ -67,9 +67,11 @@
                                     </form>
                                 </td>
                                 <td align="center">
-                                    <button type="button" name="updateAuthor" data-toggle="modal" data-target="#updateModal">
+                                    <button type="button" name="updateAuthor" data-toggle="modal" data-target="#updateModal" value="${a}">
                                         <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                                         <span class="sr-only">Edit</span>
+                                        <c:set var="author" value="${a}"></c:set>
+                                        ${author}
                                     </button>
                                     <!-- Modal -->
 <div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -80,16 +82,15 @@
         <h4 class="modal-title" id="myModalLabel">Edit Author</h4>
       </div>
       <div class="modal-body">
-          <form id="updateForm" name="updateForm" method=POST" action="AuthorController?action=update">
+          <p>${author}</p>
+          <form id="updateForm" name="updateForm" method="POST" action="AuthorController?action=update">
               <label for="authorId">Author ID</label>
-              <select name="authorId" value="authorId" id="authorId">
-                  <option>${a.authorId}</option>
-              </select><br>
+              <p name="authorId">${author.authorId}</p>
               <label for="authorName">Author Name:</label>
               <input type="text" name="authorName" id="authorName" value="${a.authorName}"><br>
               <label for="date">Date Added:</label>
               <input type="date" name="dateAdded" id="dateAdded" value="${a.dateCreated}"><br>
-              <button type="submit" class="btn btn-primary" data-dismiss="modal">Save changes</button>
+              <input type="submit" value="Update">
         </form>
       </div>
       <div class="modal-footer">
@@ -114,7 +115,7 @@
             
         </div>
  
-         <!-- Modal -->
+         <!-- Insert Modal -->
 <div class="modal fade" id="insertModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -125,10 +126,38 @@
       <div class="modal-body">
           <form method="POST" action="AuthorController?action=insert" id="insertForm" name="insertForm">
               <label for="addName">Author Name:</label>
-              <input type="text" name="authorName" id="authorName"><br>
+              <input type="text" name="addName" id="addName"><br>
               <label for="addDate">Date Added:</label>
-              <input type="date" name="dateAdded" id="dateAdded" value="e.g. 2015-09-02"><br>
+              <input type="date" name="addDate" id="addDate" value="e.g. 2015-09-02"><br>
               <input type="submit" value="Save Author">
+        </form>
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div><!--End Modal-->
+  <!-- Update Link Modal -->
+<div class="modal fade" id="updateModal2" tabindex="-1" role="dialog" aria-labelledby="Update">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Update Author</h4>
+      </div>
+      <div class="modal-body">
+          <form method="POST" action="AuthorController?action=update" id="updateForm2" name="updateForm2">
+              <select name="updateId">
+                  <c:forEach var="a" items="${authors}">
+                      <option value="${a.authorId}">${a.authorId}</option>
+                  </c:forEach>
+              </select>
+              <label for="updateName">Author Name:</label>
+              <input type="text" name="updateName" id="updateName"><br>
+              <label for="updateDate">Date Added:</label>
+              <input type="date" name="updateDate" id="updateDate"><p>e.g.YYYY-MM-DD</p><br>
+              <input type="submit" value="Update Author">
         </form>
       </div>
       <div class="modal-footer">

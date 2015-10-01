@@ -1,6 +1,7 @@
 package edu.wctc.web.ek.bookwebapp2.model;
 
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -98,18 +99,21 @@ public class AuthorDAO implements IAuthorDAO {
         }
     }
     
-    public void updateAuthor(Author author) throws ClassNotFoundException, SQLException{
+    public void updateAuthor(String authorId, String authorName, String date) 
+            throws ClassNotFoundException, SQLException, ParseException{
         List<String>colNames = new ArrayList<>();
         List<Object>colValues = new ArrayList<>();
         colNames.add(NAME_COL);
         colNames.add(DATE_COL);
         
-        colValues.add(author.getAuthorName());
-        colValues.add(author.getDateCreated());
+        colValues.add(authorName);
+        
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");     
+        colValues.add(format.parse(date));
         
         db.openConnection(driverClass, url, userName, password);
         try{
-        db.updateRecord(TABLE_NAME, colNames, colValues, ID_COL, author.getAuthorId());
+        db.updateRecord(TABLE_NAME, colNames, colValues, ID_COL, Integer.parseInt(authorId));
         }finally{
             db.closeConnection();
         }
@@ -128,7 +132,7 @@ public class AuthorDAO implements IAuthorDAO {
         
         try{
             //author.deleteAuthorbyId("author_id", 7);
-            author.updateAuthor(aa);
+            //author.updateAuthor(aa);
             records = author.getAllAuthors();
         }catch(ClassNotFoundException cnfe){
             System.out.println("Class Not Found");

@@ -8,6 +8,7 @@ import edu.wctc.web.ek.bookwebapp2.model.AuthorService;
 import edu.wctc.web.ek.bookwebapp2.model.DatabaseStrategy;
 import edu.wctc.web.ek.bookwebapp2.model.MySqlDb;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -26,7 +27,7 @@ import javax.sql.DataSource;
 /**
  * The main controller for author-related activities
  *
- * @author jekordik
+ * @author ekordik
  */
 @WebServlet(name = "AuthorController", urlPatterns = {"/AuthorController"})
 public class AuthorController extends HttpServlet {
@@ -52,79 +53,61 @@ public class AuthorController extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-
+        response.setContentType("text/html;charset=UTF-8");        
+        
+      
+       
         String destination = LIST_PAGE;
         String action = request.getParameter(ACTION_PARAM);
-
-        /*
-         For now we are hard-coding the strategy objects into this
-         controller. In the future we'll auto inject them from a config
-         file. Also, the DAO opens/closes a connection on each method call,
-         which is not very efficient. In the future we'll learn how to use
-         a connection pool to improve this.
-         */
-        DatabaseStrategy db = new MySqlDb();
-        IAuthorDAO authDao
-                = new AuthorDAO(db, "com.mysql.jdbc.Driver",
-                        "jdbc:mysql://localhost:3306/book", "root", "admin");
-        AuthorService authService = new AuthorService(authDao);
-
+        
+        
         try {
-            /*
-             Here's what the connection pool version looks like.
-             */
-//            Context ctx = new InitialContext();
-//            DataSource ds = (DataSource)ctx.lookup("jdbc/book");
-//            AuthorDaoStrategy authDao = new ConnPoolAuthorDao(ds, new MySqlDbStrategy());
-//            AuthorService authService = new AuthorService(authDao);
+            
+            AuthorService service = injectDependencesGetAuthorService();
+            
 
             /*
              Determine what action to take based on a passed in QueryString
              Parameter
              */
-            if (action.equals(LIST_ACTION)) {
-                List<Author> authors = null;
-                authors = authService.getAllAuthors();
-                request.setAttribute("authors", authors);
-                destination = LIST_PAGE;
-
-            } else if (action.equals(ADD_ACTION)) {
-                String authorName=  request.getParameter("addName");
-                String date =request.getParameter("addDate");
+            switch(action){
+                case LIST_ACTION: {
+                    refreshAuthorsList(request, service);
+                    destination = LIST_PAGE;
+                }break;
+                case ADD_ACTION:{
+                    String authorName = request.getParameter("addName");
+                    String date = request.getParameter("addDate");
                 
-                authService.saveAuthor(authorName, date);
+                    service.saveAuthor(authorName, date);
                 
-                request.setAttribute("authors", getAuthors(authService));
+                    refreshAuthorsList(request, service);
+                    destination = LIST_PAGE;
+                }break;
+                case DELETE_ACTION: {
+                    String authorID = request.getParameter("deleteAuthor");
+                    service.deleteAuthor(authorID);
                 
-            } else if (action.equals(UPDATE_ACTION)) {
-                String authorName = request.getParameter("authorName");
-                String dateCreated = request.getParameter("date");
-                String authorId = request.getParameter("authorId");
+                    List<Author> authors = null;
+                    authors = service.getAllAuthors();
                 
-                DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-                Date date = format.parse(dateCreated);
+                    request.setAttribute("authors", authors);
+                    destination = LIST_PAGE;
+                }break;
+                case UPDATE_ACTION: {
+                    String authorName = request.getParameter("updateName");
+                    String dateCreated = request.getParameter("updateDate");
+                    String authorId = request.getParameter("updateId");
                 
-                Author author = new Author(Integer.parseInt(authorId), authorName, date);
+                    service.updateAuthor(authorId, authorName, dateCreated);
                 
-                authService.updateAuthor(author);
-                request.setAttribute("authors", getAuthors(authService));
-                
-                System.out.println("Ran");
-               
-            } else if (action.equals(DELETE_ACTION)) {
-                String authorID = request.getParameter("deleteAuthor");
-                authService.deleteAuthor(authorID);
-                
-                List<Author> authors = null;
-                authors = authService.getAllAuthors();
-                
-                request.setAttribute("authors", authors);
-                destination = LIST_PAGE;
-            } else {
-                // no param identified in request, must be an error
-                request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
-                destination = LIST_PAGE;
+                    refreshAuthorsList(request, service);
+                    destination = LIST_PAGE;
+                }break;
+                default: {
+                    request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
+                    destination = LIST_PAGE;
+                }
             }
             
         } catch (Exception e) {
@@ -137,10 +120,48 @@ public class AuthorController extends HttpServlet {
         dispatcher.forward(request, response);
     }
     
-    private List<Author> getAuthors(AuthorService service) throws ClassNotFoundException, SQLException{
-        return service.getAllAuthors();      
+    private void refreshAuthorsList(HttpServletRequest request, AuthorService service) 
+            throws ClassNotFoundException, SQLException{
+            List<Author> authors = service.getAllAuthors();
+            request.setAttribute("authors", authors);
+           
     }
 
+    private AuthorService injectDependencesGetAuthorService() throws Exception{
+            String dbClassName = this.getServletContext().getInitParameter("dbStrategy");
+            String driverClass = this.getServletContext().getInitParameter("driverClass");
+            String url = this.getServletContext().getInitParameter("url");
+            String userName = this.getServletContext().getInitParameter("username");
+            String password = this.getServletContext().getInitParameter("password");
+            String authorDAOClassName = this.getServletContext().getInitParameter("authorDAO");
+            
+            Class dbClass = Class.forName(dbClassName);
+            DatabaseStrategy db =  (DatabaseStrategy)dbClass.newInstance();
+            
+            IAuthorDAO authorDao;
+            Class daoClass = Class.forName(authorDAOClassName);
+            Constructor constructor = daoClass.getConstructor(new Class[] {
+                DatabaseStrategy.class, String.class, String.class, String.class, String.class});
+                   
+            if(constructor != null){
+                Object[] constructorArgs = new Object[]{db, driverClass, url, userName, password};
+                authorDao = (IAuthorDAO)constructor.newInstance(constructorArgs);
+                
+            }else{
+                authorDao = new AuthorDAO(db, "com.mysql.jdbc.Driver", 
+                        "jdbc:mysql://localhost:3306/book", "root", "admin");
+                
+                            /*
+             Here's what the connection pool version looks like.
+             */
+//            Context ctx = new InitialContext();
+//            DataSource ds = (DataSource)ctx.lookup("jdbc/book");
+//            AuthorDaoStrategy authDao = new ConnPoolAuthorDao(ds, new MySqlDbStrategy());
+//            AuthorService authService = new AuthorService(authDao);
+            }
+            
+            return new AuthorService(authorDao);
+    }
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.

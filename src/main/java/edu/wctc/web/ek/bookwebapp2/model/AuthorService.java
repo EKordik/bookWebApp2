@@ -29,8 +29,8 @@ public class AuthorService {
         authorStrategy.saveAuthor(authorName, date);
     }
     
-    public void updateAuthor(Author author) throws ClassNotFoundException, SQLException{
-        authorStrategy.updateAuthor(author);
+    public void updateAuthor(String authorId, String authorName, String date) throws ClassNotFoundException, SQLException, ParseException{
+        authorStrategy.updateAuthor(authorId, authorName, date);
     }
     
     public static void main(String[] args) {

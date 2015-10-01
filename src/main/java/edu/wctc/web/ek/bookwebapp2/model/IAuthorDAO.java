@@ -16,5 +16,5 @@ public interface IAuthorDAO {
     
     public abstract void saveAuthor(String authorName, String date)throws ClassNotFoundException, SQLException, ParseException;
     
-    public void updateAuthor(Author author) throws ClassNotFoundException, SQLException;
+    public void updateAuthor(String authorId, String authorName, String date) throws ClassNotFoundException, SQLException, ParseException;
 }
