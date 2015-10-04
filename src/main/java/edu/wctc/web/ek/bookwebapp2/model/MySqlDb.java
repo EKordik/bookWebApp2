@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.sql.DataSource;
 
 /**
  *
@@ -30,7 +31,12 @@ public class MySqlDb implements DatabaseStrategy {
     }
     
     @Override
-    public void closeConnection() throws SQLException{
+    public void openConnection(DataSource ds) throws ClassNotFoundException, SQLException{
+        conn = ds.getConnection();
+    }
+    
+   
+    private void closeConnection() throws SQLException{
         conn.close();
     }
     
@@ -39,99 +45,105 @@ public class MySqlDb implements DatabaseStrategy {
         List<Map<String,Object>> records = new ArrayList<>();
         
         String sql = "SELECT * From " + tableName;
-        Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery(sql);
-        ResultSetMetaData metaData = rs.getMetaData();
-        int columnCount = metaData.getColumnCount();
-        
-        while(rs.next()){
-            Map<String,Object> record = new HashMap<>();
-            for(int i = 1; i<=columnCount; i++){
-                record.put(metaData.getColumnName(i), rs.getObject(i));
+        try{
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnCount = metaData.getColumnCount();
+
+            while(rs.next()){
+                Map<String,Object> record = new HashMap<>();
+                for(int i = 1; i<=columnCount; i++){
+                    record.put(metaData.getColumnName(i), rs.getObject(i));
+                }
+                records.add(record);
             }
-            records.add(record);
+        
+        }finally{
+            closeConnection();
         }
-        
-        
         return records;
     }
     
+     @Override
+    public Map<String,Object> getRecordbyId(String tableName, String idColumnName, Object idValue) 
+            throws SQLException{
+        PreparedStatement getRecord = null;
+        String sql = "SELECT * FROM " + tableName + " WHERE " + idColumnName + "=?";
+        Map<String,Object> record = new HashMap();
+        try{
+            getRecord = conn.prepareStatement(sql);
+            getRecord.setObject(1, idValue);
+            
+            ResultSet rs = getRecord.executeQuery();
+            ResultSetMetaData metadata = rs.getMetaData();
+            int columnCount = metadata.getColumnCount();
+            
+            if(rs.next()){
+                for(int i = 1; i<=columnCount; i++){
+                    record.put(metadata.getColumnName(i), rs.getObject(i));
+                }
+            }   
+        }finally{
+            getRecord.close();
+            closeConnection();
+        }
+        
+        return record;
+    }
     @Override
     public void deleteByPrimaryKey(String tableName, String primaryKeyColumnName, 
             Object primaryKeyValue) throws SQLException{
-//        String sql = "DELETE FROM " + tableName + " WHERE " + 
-//                primaryKeyColumnName + "=";
 //        
-//        if(primaryKeyValue instanceof String){
-//             sql += "'" + primaryKeyValue + "'";
-//        }else{
-//            sql += primaryKeyValue;
-//        }
-//        
-//        Statement stmt = conn.createStatement();
-//        int columnsDeleted = stmt.executeUpdate(sql);
-                PreparedStatement deleteStmt = null;
-        
+        PreparedStatement deleteStmt = null;
         String sql = "DELETE FROM " + tableName + " WHERE " + primaryKeyColumnName + "=?";
         
+        try{
         deleteStmt = conn.prepareStatement(sql);
         
         deleteStmt.setObject(1, primaryKeyValue);
         
         int columnsDeleted = deleteStmt.executeUpdate();
+        
+        }finally{
+            closeConnection();
+        }
     }
     
     
     @Override
     public void insertRecord(String tableName, List<String> colNames, 
             List<Object> colValues)throws SQLException{
-//        String sql = "INSERT INTO " + tableName + " (";
-//        
-//        for(int i = 0; i< colNames.size(); i++){
-//            sql+= colNames.get(i) + ", ";
-//        }
-//        sql = sql.substring(0, sql.length()-2);
-//        sql += ") VALUES(";
-//        
-//        for(int i = 0; i<colValues.size(); i++){
-//            if(colValues.get(i) instanceof String){
-//                sql += "'" + colValues.get(i) + "', ";
-//            }else{
-//                sql += colValues.get(i) + ", ";
-//            }
-//        }
-//        
-//        sql = sql.substring(0, sql.length()-2);
-//        sql += ")";
-//        
-//                System.out.println(sql);
-//
-//        Statement stmt = conn.createStatement();
-//        int insertedColumns = stmt.executeUpdate(sql);
+        try{
+            PreparedStatement stmt = buildInsertStatement(tableName, colNames);
+
+            for(int i = 1; i<=colNames.size(); i++){
+                stmt.setObject(i, colValues.get(i-1));
+            }
         
-        PreparedStatement stmt = buildInsertStatement(tableName, colNames);
-        
-        for(int i = 1; i<=colNames.size(); i++){
-            stmt.setObject(i, colValues.get(i-1));
+            int insertedRows = stmt.executeUpdate();
+        }finally{
+            closeConnection();
         }
-        
-        int insertedRows = stmt.executeUpdate();
     }
     
     public void updateRecord(String tableName, List<String>colNames, List<Object> colValues, 
             String whereColumn, Object whereValue) throws SQLException{
-        PreparedStatement stmt = buildUpdateStatement(tableName, colNames, whereColumn);
-        
-        for(int i = 1; i<=colNames.size(); i++){
-            stmt.setObject(i, colValues.get(i-1));
+        try{
+            PreparedStatement stmt = buildUpdateStatement(tableName, colNames, whereColumn);
+
+            for(int i = 1; i<=colNames.size(); i++){
+                stmt.setObject(i, colValues.get(i-1));
+            }
+
+            if(whereColumn != null){
+                stmt.setObject(colNames.size()+1, whereValue);
+            }
+
+            int recordsUpdated = stmt.executeUpdate();
+        }finally{
+            closeConnection();
         }
-        
-        if(whereColumn != null){
-            stmt.setObject(colNames.size()+1, whereValue);
-        }
-        
-        int recordsUpdated = stmt.executeUpdate();
-        System.out.println(recordsUpdated);
             
     }
     private PreparedStatement buildUpdateStatement(String tableName, List<String>colNames,
@@ -202,14 +214,17 @@ public class MySqlDb implements DatabaseStrategy {
 
         try{
             //db.deleteByID("author", "author_id", 6);
-            db.updateRecord("author", colNames, colValues, "author_id", 11);
-            records = db.getAllRecords("author");
+           // db.updateRecord("author", colNames, colValues, "author_id", 11);
+            //records = db.getAllRecords("author");
+            Map<String,Object> record = db.getRecordbyId("author_name", "author_id", 8);
+             System.out.println(record);
         }finally{
-            db.closeConnection();
+            //db.closeConnection();
         }
         
-        for(Map record: records){
-            System.out.println(record);
-        }
+  
+//        for(Map record: records){
+//            System.out.println(record);
+//        }
     }
 }

@@ -11,7 +11,7 @@
     </context-param>
     <context-param>
         <param-name>authorDAO</param-name>
-        <param-value>edu.wctc.web.ek.bookwebapp2.model.AuthorDAO</param-value>
+        <param-value>edu.wctc.web.ek.bookwebapp2.model.ConnectionPoolAuthorDAO</param-value>
     </context-param>
     <context-param>
         <param-name>driverClass</param-name>
@@ -28,6 +28,10 @@
     <context-param>  
         <param-name>password</param-name>
         <param-value>admin</param-value>
+    </context-param>
+    <context-param>
+        <param-name>dataSource</param-name>
+        <param-value>jdbc/book</param-value>
     </context-param>
     
     <session-config>

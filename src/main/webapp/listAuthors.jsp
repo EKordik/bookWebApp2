@@ -67,12 +67,14 @@
                                     </form>
                                 </td>
                                 <td align="center">
-                                    <button type="button" name="updateAuthor" data-toggle="modal" data-target="#updateModal" value="${a}">
-                                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                                        <span class="sr-only">Edit</span>
-                                        <c:set var="author" value="${a}"></c:set>
-                                        ${author}
-                                    </button>
+                                    <form name="updateForm" method="POST" action="AuthorController?action=findUpdate">                                            
+                                        <button id="updateAuthor" name="updateAuthor" value="${rowCount}">
+                                            <c:set var="updateId" value="${a.authorId}"/>
+                                            <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                                            <span class="sr-only">Edit</span>
+                                        </button>
+                                    </form>
+
                                     <!-- Modal -->
 <div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document">
@@ -82,10 +84,9 @@
         <h4 class="modal-title" id="myModalLabel">Edit Author</h4>
       </div>
       <div class="modal-body">
-          <p>${author}</p>
           <form id="updateForm" name="updateForm" method="POST" action="AuthorController?action=update">
               <label for="authorId">Author ID</label>
-              <p name="authorId">${author.authorId}</p>
+              <p name="authorId">${updateId}</p>
               <label for="authorName">Author Name:</label>
               <input type="text" name="authorName" id="authorName" value="${a.authorName}"><br>
               <label for="date">Date Added:</label>
@@ -167,6 +168,14 @@
   </div>
 </div><!--End Modal-->
         <script src="http://code.jquery.com/jquery-latest.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>    
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script> 
+        <script>$(document).ready(function() {
+          
+                if (window.location.hash == "#update") {
+                    $('#updateModal').modal('show');
+                    
+                }
+
+});</script>
     </body>
 </html>

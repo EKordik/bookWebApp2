@@ -14,6 +14,8 @@ public interface IAuthorDAO {
 
     List<Author> getAllAuthors() throws ClassNotFoundException, SQLException;
     
+    public abstract Author getAuthorbyId(String authorId) throws ClassNotFoundException, SQLException;
+    
     public abstract void saveAuthor(String authorName, String date)throws ClassNotFoundException, SQLException, ParseException;
     
     public void updateAuthor(String authorId, String authorName, String date) throws ClassNotFoundException, SQLException, ParseException;

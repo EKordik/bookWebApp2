@@ -21,6 +21,10 @@ public class AuthorService {
         return authorStrategy.getAllAuthors();
     }
     
+    public Author getAuthorbyId(String authorId) throws ClassNotFoundException, SQLException{
+        return authorStrategy.getAuthorbyId(authorId);
+    }
+    
     public void deleteAuthor(String authorId) throws ClassNotFoundException, SQLException{
         authorStrategy.deleteAuthorbyId(authorId);
     }

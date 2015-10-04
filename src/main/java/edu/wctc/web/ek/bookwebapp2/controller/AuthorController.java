@@ -41,7 +41,15 @@ public class AuthorController extends HttpServlet {
     private static final String UPDATE_ACTION = "update";
     private static final String DELETE_ACTION = "delete";
     private static final String ACTION_PARAM = "action";
-
+    private static final String UPDATE_FIND_ACTION = "findUpdate";
+    private static final String UPDATE_PAGE = "/editAuthor.jsp";
+    private String dbClassName;
+    private String driverClass;
+    private String url;
+    private String userName;
+    private String password;
+    private String authorDAOClassName;
+    private String jndiName;
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -54,9 +62,7 @@ public class AuthorController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");        
-        
-      
-       
+
         String destination = LIST_PAGE;
         String action = request.getParameter(ACTION_PARAM);
         
@@ -64,7 +70,6 @@ public class AuthorController extends HttpServlet {
         try {
             
             AuthorService service = injectDependencesGetAuthorService();
-            
 
             /*
              Determine what action to take based on a passed in QueryString
@@ -73,7 +78,6 @@ public class AuthorController extends HttpServlet {
             switch(action){
                 case LIST_ACTION: {
                     refreshAuthorsList(request, service);
-                    destination = LIST_PAGE;
                 }break;
                 case ADD_ACTION:{
                     String authorName = request.getParameter("addName");
@@ -82,7 +86,6 @@ public class AuthorController extends HttpServlet {
                     service.saveAuthor(authorName, date);
                 
                     refreshAuthorsList(request, service);
-                    destination = LIST_PAGE;
                 }break;
                 case DELETE_ACTION: {
                     String authorID = request.getParameter("deleteAuthor");
@@ -92,7 +95,6 @@ public class AuthorController extends HttpServlet {
                     authors = service.getAllAuthors();
                 
                     request.setAttribute("authors", authors);
-                    destination = LIST_PAGE;
                 }break;
                 case UPDATE_ACTION: {
                     String authorName = request.getParameter("updateName");
@@ -104,9 +106,11 @@ public class AuthorController extends HttpServlet {
                     refreshAuthorsList(request, service);
                     destination = LIST_PAGE;
                 }break;
+                case UPDATE_FIND_ACTION:{
+                    destination = UPDATE_PAGE;
+                }break;
                 default: {
                     request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
-                    destination = LIST_PAGE;
                 }
             }
             
@@ -123,44 +127,53 @@ public class AuthorController extends HttpServlet {
     private void refreshAuthorsList(HttpServletRequest request, AuthorService service) 
             throws ClassNotFoundException, SQLException{
             List<Author> authors = service.getAllAuthors();
-            request.setAttribute("authors", authors);
-           
+            request.setAttribute("authors", authors);   
     }
 
     private AuthorService injectDependencesGetAuthorService() throws Exception{
-            String dbClassName = this.getServletContext().getInitParameter("dbStrategy");
-            String driverClass = this.getServletContext().getInitParameter("driverClass");
-            String url = this.getServletContext().getInitParameter("url");
-            String userName = this.getServletContext().getInitParameter("username");
-            String password = this.getServletContext().getInitParameter("password");
-            String authorDAOClassName = this.getServletContext().getInitParameter("authorDAO");
             
             Class dbClass = Class.forName(dbClassName);
             DatabaseStrategy db =  (DatabaseStrategy)dbClass.newInstance();
             
             IAuthorDAO authorDao;
             Class daoClass = Class.forName(authorDAOClassName);
-            Constructor constructor = daoClass.getConstructor(new Class[] {
+            Constructor constructor = null;
+            try{
+                constructor = daoClass.getConstructor(new Class[] {
                 DatabaseStrategy.class, String.class, String.class, String.class, String.class});
-                   
+            }catch(NoSuchMethodException nsme){
+                //Nothing needs done here
+            }   
+            
             if(constructor != null){
                 Object[] constructorArgs = new Object[]{db, driverClass, url, userName, password};
                 authorDao = (IAuthorDAO)constructor.newInstance(constructorArgs);
                 
             }else{
-                authorDao = new AuthorDAO(db, "com.mysql.jdbc.Driver", 
-                        "jdbc:mysql://localhost:3306/book", "root", "admin");
+                Context ctx = new InitialContext();
+                DataSource ds = (DataSource)ctx.lookup(jndiName);
+                constructor = daoClass.getConstructor(new Class[]{
+                    DataSource.class,DatabaseStrategy.class});
+                Object[] constructorArgs = new Object[]{
+                    ds,db
+                };
                 
-                            /*
-             Here's what the connection pool version looks like.
-             */
-//            Context ctx = new InitialContext();
-//            DataSource ds = (DataSource)ctx.lookup("jdbc/book");
-//            AuthorDaoStrategy authDao = new ConnPoolAuthorDao(ds, new MySqlDbStrategy());
-//            AuthorService authService = new AuthorService(authDao);
+                authorDao = (IAuthorDAO)constructor.newInstance(constructorArgs);
+                
             }
             
             return new AuthorService(authorDao);
+    }
+    
+    @Override
+    public void init() throws ServletException{
+        dbClassName = this.getServletContext().getInitParameter("dbStrategy");
+        driverClass = this.getServletContext().getInitParameter("driverClass");
+        url = this.getServletContext().getInitParameter("url");
+        userName = this.getServletContext().getInitParameter("username");
+        password = this.getServletContext().getInitParameter("password");
+        authorDAOClassName = this.getServletContext().getInitParameter("authorDAO");
+        jndiName = this.getServletContext().getInitParameter("dataSource");
     }
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

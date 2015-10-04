@@ -5,65 +5,56 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Date;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 
 /**
  *
  * @author emmakordik
  */
-public class AuthorDAO implements IAuthorDAO {
+public class ConnectionPoolAuthorDAO implements IAuthorDAO {
     private DatabaseStrategy db;
-    private String driverClass;
-    private String url;
-    private String userName;
-    private String password;
+    private DataSource ds;
+    
     private final static String TABLE_NAME = "author";
     private final static String NAME_COL = "author_name";
     private final static String ID_COL = "author_id";
     private final static String DATE_COL = "date_created";
-    private final static String SQL_DATE_FORMAT = "yyyy-MM-dd";
     
-    public AuthorDAO(DatabaseStrategy db, String driverClass, String url, 
-            String userName, String password){
+    public ConnectionPoolAuthorDAO(DataSource ds, DatabaseStrategy db){
         this.db = db;
-        this.driverClass = driverClass;
-        this.url= url;
-        this.userName = userName;
-        this.password = password;
+        this.ds = ds;
     }
     
-    /**
-     * 
-     * @return - A list of author objects
-     * @throws ClassNotFoundException
-     * @throws SQLException 
-     */
     @Override
     public List<Author> getAllAuthors() 
             throws ClassNotFoundException, SQLException{
         List<Author> authors = new ArrayList<>();
         
-        db.openConnection(driverClass, url, userName, password);
-
+        db.openConnection(ds);
+    
         List<Map<String,Object>> rawRecords = db.getAllRecords(TABLE_NAME);
 
         Author a;
         for(Map rawRecord: rawRecords){
             a = new Author();
-            Object obj = rawRecord.get(ID_COL);
+            Object obj = rawRecord.get("author_id");
             a.setAuthorId(Integer.parseInt(obj.toString()));
 
-            String authorName = rawRecord.get(NAME_COL) == null ? "" : rawRecord.get(NAME_COL).toString();
+            String authorName = rawRecord.get("author_name") == null ? "" : rawRecord.get("author_name").toString();
             a.setAuthorName(authorName);
 
-            obj = rawRecord.get(DATE_COL);
-            Date creationDate = (obj == null) ? new Date() : (Date)rawRecord.get(DATE_COL);
+            obj = rawRecord.get("date_created");
+            Date creationDate = (obj == null) ? new Date() : (Date)rawRecord.get("date_created");
             a.setDateCreated(creationDate);
             authors.add(a);
         }
-
+       
         return authors;
     }
     
@@ -71,7 +62,7 @@ public class AuthorDAO implements IAuthorDAO {
         Author author = new Author();
         int aId = Integer.parseInt(authorId);
         
-        db.openConnection(driverClass, url, userName, password);
+        db.openConnection(ds);
         Map<String,Object> rawRec = db.getRecordbyId(TABLE_NAME, ID_COL, aId);
         
         author.setAuthorId(aId);
@@ -85,17 +76,11 @@ public class AuthorDAO implements IAuthorDAO {
         
         return author;
     }
-    /**
-     * 
-     * @param author - String to contain the author Id for the author to be deleted
-     * @throws ClassNotFoundException
-     * @throws SQLException
-     * @throws NumberFormatException 
-     */
+    
     @Override
     public void deleteAuthorbyId(String author)throws ClassNotFoundException, SQLException, NumberFormatException{
         int authorId = Integer.parseInt(author);
-        db.openConnection(driverClass, url, userName, password);
+        db.openConnection(ds);
 
         db.deleteByPrimaryKey(TABLE_NAME, ID_COL, authorId);
 
@@ -105,7 +90,7 @@ public class AuthorDAO implements IAuthorDAO {
             throws ClassNotFoundException, SQLException, ParseException{
         List<String> colNames = new ArrayList<>();
         List<Object> colValues = new ArrayList<>();
-        SimpleDateFormat stf = new SimpleDateFormat(SQL_DATE_FORMAT);
+        SimpleDateFormat stf = new SimpleDateFormat("yyyy-MM-dd");
         
         colNames.add(NAME_COL);
         colNames.add(DATE_COL);
@@ -118,10 +103,9 @@ public class AuthorDAO implements IAuthorDAO {
             colValues.add(stf.format(new Date()));
         }
         
-        db.openConnection(driverClass, url, userName, password);
-    
+        db.openConnection(ds);
         db.insertRecord(TABLE_NAME, colNames, colValues);
-
+       
     }
     
     public void updateAuthor(String authorId, String authorName, String date) 
@@ -133,24 +117,21 @@ public class AuthorDAO implements IAuthorDAO {
         
         colValues.add(authorName);
         
-        DateFormat format = new SimpleDateFormat(SQL_DATE_FORMAT);     
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");     
         colValues.add(format.parse(date));
         
-        db.openConnection(driverClass, url, userName, password);
-        
+        db.openConnection(ds);
+
         db.updateRecord(TABLE_NAME, colNames, colValues, ID_COL, Integer.parseInt(authorId));
         
     }
     
-    public static void main(String[] args) {
-        AuthorDAO author = new AuthorDAO(new MySqlDb(), "com.mysql.jdbc.Driver",
-                "jdbc:mysql://localhost:3306/book","root","admin");
+    public static void main(String[] args) throws NamingException {
+        Context ctx = new InitialContext();
+        DataSource ds = (DataSource) ctx.lookup("jdbc/book");
+        IAuthorDAO author = new ConnectionPoolAuthorDAO(ds, new MySqlDb());
             
         List<Author> records = new ArrayList<>();
-        Author aa = new Author();
-        aa.setAuthorId(10);
-        aa.setAuthorName("Hans Christian Anderson");
-        aa.setDateCreated(new Date());
         
         try{
             //author.deleteAuthorbyId("author_id", 7);
