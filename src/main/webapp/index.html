@@ -9,15 +9,25 @@
     <head>
         <title>Book Web App</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+        <link rel="stylesheet" href="bookWebApp.css">
     </head>
     <body>
-       <h1>Pick an Administrative Task</h1>
-        <ol>
-            <li><a href="AuthorController?action=list">View all Authors</a></li>
-            <li>Add New Author</li>
-            <li><a href="listAuthors.jsp#update">Update an Author</a></li>
-            
-            <li>Delete an Author</li>
-        </ol>
+        <header id="header">
+            <h1>Pick an Administrative Task</h1>
+        </header>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-4"></div>
+                <div class="col-xs-4">
+                <ol>
+                    <li class="btn btn-primary"><a href="AuthorController?action=list" style="color: white">View all Authors</a></li>
+                  
+                </ol>
+                    </div>
+            </div>
+        </div>
+        <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script> 
     </body>
 </html>

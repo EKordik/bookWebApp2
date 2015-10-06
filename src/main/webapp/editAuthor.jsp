@@ -28,18 +28,19 @@
                 <nav class="col-xs-3">
                     <div class="fixed">
                         <ul>
-                            <li>View Author</li>
+                            <li><a href="AuthorController?action=list">View all Authors</a></li>
                         </ul>
                     </div>
                 </nav>
                 <div class="col-xs-9">
-                    <h3>Author ID</h3>
+                    <h3>Edit Author with ID ${author.authorId}</h3>
                     <form method="POST" action="AuthorController?action=update" id="updateForm" name="updateForm">
+                        <input type="hidden" name="updateId" value="${author.authorId}">
                         <label for="updateName">Author Name:</label>
-                        <input type="text" name="updateName" id="updateName"><br>
+                        <input type="text" name="updateName" id="updateName" value="${author.authorName}"><br>
                         <label for="updateDate">Date Added:</label>
-                        <input type="date" name="updateDate" id="updateDate"><p>e.g.YYYY-MM-DD</p><br>
-                        <input type="submit" value="Update Author">
+                        <input type="date" name="updateDate" id="updateDate" value="${author.dateCreated}"><br>
+                        <input type="submit" value="Update Author" class="btn btn-info">
                     </form>
 
                 </div>

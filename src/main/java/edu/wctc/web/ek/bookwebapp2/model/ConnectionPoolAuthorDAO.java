@@ -97,7 +97,7 @@ public class ConnectionPoolAuthorDAO implements IAuthorDAO {
         
         colValues.add(authorName);
         
-        if(date != null){
+        if(date != null && !date.isEmpty()){
             colValues.add(stf.parse(date));
         }else{
             colValues.add(stf.format(new Date()));
@@ -116,6 +116,8 @@ public class ConnectionPoolAuthorDAO implements IAuthorDAO {
         colNames.add(DATE_COL);
         
         colValues.add(authorName);
+        
+        
         
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd");     
         colValues.add(format.parse(date));

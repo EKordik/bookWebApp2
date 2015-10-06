@@ -13,5 +13,14 @@ button{
 
 li{
     list-style-type: none;
+    margin: 3px;
+}
 
+a{
+    color: white;
+}
+
+a:hover{
+    color: aliceblue;
+    text-decoration: none;
 }

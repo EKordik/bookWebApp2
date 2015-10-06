@@ -81,8 +81,12 @@ public class AuthorController extends HttpServlet {
                 }break;
                 case ADD_ACTION:{
                     String authorName = request.getParameter("addName");
-                    String date = request.getParameter("addDate");
-                
+                    String date;
+                    if(request.getParameter("addDate") == null){
+                        date = "";
+                    }else{
+                        date = request.getParameter("addDate");
+                    }
                     service.saveAuthor(authorName, date);
                 
                     refreshAuthorsList(request, service);
@@ -107,6 +111,10 @@ public class AuthorController extends HttpServlet {
                     destination = LIST_PAGE;
                 }break;
                 case UPDATE_FIND_ACTION:{
+                    String authorID = request.getParameter("updateAuthor");
+                    Author a = service.getAuthorbyId(authorID);
+                    
+                    request.setAttribute("author", a);
                     destination = UPDATE_PAGE;
                 }break;
                 default: {

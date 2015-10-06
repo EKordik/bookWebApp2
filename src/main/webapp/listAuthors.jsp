@@ -29,9 +29,8 @@
                 <nav class="col-xs-3">
                     <div class="fixed">
                         <ul>
-                            <li>Delete Author</li>
-                            <li><a data-toggle="modal" href="#updateModal2">Update Author</a></li>
-                            <li><a data-toggle="modal" href="#insertModal">Insert Author</a></li>
+                            <li class="btn btn-info"><a data-toggle="modal" href="#updateModal2">Update Author</a></li>
+                            <li class="btn btn-info"><a data-toggle="modal" href="#insertModal">Insert Author</a></li>
                         </ul>
                     </div>
                 </nav>
@@ -68,7 +67,7 @@
                                 </td>
                                 <td align="center">
                                     <form name="updateForm" method="POST" action="AuthorController?action=findUpdate">                                            
-                                        <button id="updateAuthor" name="updateAuthor" value="${rowCount}">
+                                        <button id="updateAuthor" name="updateAuthor" value="${a.authorId}">
                                             <c:set var="updateId" value="${a.authorId}"/>
                                             <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                                             <span class="sr-only">Edit</span>
