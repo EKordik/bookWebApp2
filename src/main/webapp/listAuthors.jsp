@@ -28,15 +28,16 @@
             <div class="row">
                 <nav class="col-xs-3">
                     <div class="fixed">
-                        <ul>
-                            <li class="btn btn-info"><a data-toggle="modal" href="#updateModal2">Update Author</a></li>
-                            <li class="btn btn-info"><a data-toggle="modal" href="#insertModal">Insert Author</a></li>
-                        </ul>
+                        <form method="POST" action="AuthorController?action=home">
+                            <button type="submit" class="btn ${btnClass} btnSpacing">Home</button>
+                        </form>
+                        <button type="button" class="btn ${btnClass} btnSpacing" data-toggle="modal" href="#updateModal2">Update Author</button>
+                        <button type="button" class="btn ${btnClass} btnSpacing" data-toggle="modal" href="#uinsertModal">Add Author</button>
                     </div>
                 </nav>
                 <div class="col-xs-9">
                     <table width="500" border="1" cellspacing="0" cellpadding="4">
-                        <tr style="background-color: black;color:white;">
+                        <tr style="background-color: black; color:white;">
                             <th align="left" class="tableHead">ID</th>
                             <th align="left" class="tableHead">Author Name</th>
                             <th align="right" class="tableHead">Date Added</th>
@@ -73,32 +74,6 @@
                                             <span class="sr-only">Edit</span>
                                         </button>
                                     </form>
-
-                                    <!-- Modal -->
-<div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Edit Author</h4>
-      </div>
-      <div class="modal-body">
-          <form id="updateForm" name="updateForm" method="POST" action="AuthorController?action=update">
-              <label for="authorId">Author ID</label>
-              <p name="authorId">${updateId}</p>
-              <label for="authorName">Author Name:</label>
-              <input type="text" name="authorName" id="authorName" value="${a.authorName}"><br>
-              <label for="date">Date Added:</label>
-              <input type="date" name="dateAdded" id="dateAdded" value="${a.dateCreated}"><br>
-              <input type="submit" value="Update">
-        </form>
-      </div>
-      <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div><!--End Modal-->
                                 </td>
                             </tr>
                         </c:forEach>
@@ -168,13 +143,6 @@
 </div><!--End Modal-->
         <script src="http://code.jquery.com/jquery-latest.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script> 
-        <script>$(document).ready(function() {
-          
-                if (window.location.hash == "#update") {
-                    $('#updateModal').modal('show');
-                    
-                }
-
-});</script>
+       
     </body>
 </html>

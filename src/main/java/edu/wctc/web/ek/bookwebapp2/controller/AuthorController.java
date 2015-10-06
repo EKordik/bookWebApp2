@@ -22,20 +22,23 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 /**
- * The main controller for author-related activities
+ * The main controller for author-related activities. This class determines
+ * what action should take place when a request comes in from a web page
+ * and sends the user on to the correct web page.
  *
  * @author ekordik
+ * @version 1.00
  */
 @WebServlet(name = "AuthorController", urlPatterns = {"/AuthorController"})
 public class AuthorController extends HttpServlet {
 
-    // NO MAGIC NUMBERS!
-
     private static final String NO_PARAM_ERR_MSG = "No request parameter identified";
     private static final String LIST_PAGE = "/listAuthors.jsp";
+    private static final String INDEX_PAGE = "/index.jsp";
     private static final String LIST_ACTION = "list";
     private static final String ADD_ACTION = "insert";
     private static final String UPDATE_ACTION = "update";
@@ -43,6 +46,11 @@ public class AuthorController extends HttpServlet {
     private static final String ACTION_PARAM = "action";
     private static final String UPDATE_FIND_ACTION = "findUpdate";
     private static final String UPDATE_PAGE = "/editAuthor.jsp";
+    private static final String PREFERENCE_PAGE = "/preferences.jsp";
+    private static final String PREF_ACTION = "preference";
+    private static final String PREF_SET_ACTION = "setPref";
+    private static final String HOME_ACTION = "home";
+    private static final String DEFAULT_BTN_CLASS = "btn-primary";
     private String dbClassName;
     private String driverClass;
     private String url;
@@ -50,9 +58,15 @@ public class AuthorController extends HttpServlet {
     private String password;
     private String authorDAOClassName;
     private String jndiName;
+    
+    //Sets a session object with a default theme for the page. This can be changed by the user
+    String themeColor = null;
+
+        
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
+     * methods. This class determines which actions to preform and sets the
+     * destination page for to send the user too.
      *
      * @param request servlet request
      * @param response servlet response
@@ -61,27 +75,39 @@ public class AuthorController extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");        
-
+        response.setContentType("text/html;charset=UTF-8");  
+        
+        //Sets default color
+        HttpSession session = request.getSession();
+        
+        if(themeColor == null){
+            themeColor = "btn-primary";
+        }
+        session.setAttribute("btnClass", themeColor);
+        
+        //Sets a default page
         String destination = LIST_PAGE;
         String action = request.getParameter(ACTION_PARAM);
         
-        
+        //Variables for processing data
+        String authorID;
+        String authorName;
+        String date;
         try {
             
             AuthorService service = injectDependencesGetAuthorService();
 
             /*
-             Determine what action to take based on a passed in QueryString
+             Determine what action to take based on a passed on QueryString
              Parameter
              */
             switch(action){
                 case LIST_ACTION: {
                     refreshAuthorsList(request, service);
                 }break;
-                case ADD_ACTION:{
-                    String authorName = request.getParameter("addName");
-                    String date;
+                case ADD_ACTION:
+                    authorName = request.getParameter("addName");
+                    
                     if(request.getParameter("addDate") == null){
                         date = "";
                     }else{
@@ -90,36 +116,48 @@ public class AuthorController extends HttpServlet {
                     service.saveAuthor(authorName, date);
                 
                     refreshAuthorsList(request, service);
-                }break;
-                case DELETE_ACTION: {
-                    String authorID = request.getParameter("deleteAuthor");
+                    break;
+                case DELETE_ACTION: 
+                    authorID = request.getParameter("deleteAuthor");
                     service.deleteAuthor(authorID);
                 
                     List<Author> authors = null;
                     authors = service.getAllAuthors();
                 
                     request.setAttribute("authors", authors);
-                }break;
-                case UPDATE_ACTION: {
-                    String authorName = request.getParameter("updateName");
-                    String dateCreated = request.getParameter("updateDate");
-                    String authorId = request.getParameter("updateId");
+                    break;
+                case UPDATE_ACTION: 
+                    authorName = request.getParameter("updateName");
+                    date = request.getParameter("updateDate");
+                    authorID = request.getParameter("updateId");
                 
-                    service.updateAuthor(authorId, authorName, dateCreated);
+                    service.updateAuthor(authorID, authorName, date);
                 
                     refreshAuthorsList(request, service);
                     destination = LIST_PAGE;
-                }break;
-                case UPDATE_FIND_ACTION:{
-                    String authorID = request.getParameter("updateAuthor");
+                    break;
+                case UPDATE_FIND_ACTION:
+                    authorID = request.getParameter("updateAuthor");
                     Author a = service.getAuthorbyId(authorID);
                     
                     request.setAttribute("author", a);
                     destination = UPDATE_PAGE;
-                }break;
-                default: {
+                    break;
+                case PREF_ACTION:
+                    destination = PREFERENCE_PAGE;
+                    break;
+                case PREF_SET_ACTION:
+                    themeColor = request.getParameter("themeColor");
+
+                    session.setAttribute("btnClass", themeColor);
+
+                    destination = PREFERENCE_PAGE;
+                    break;
+                case HOME_ACTION:
+                    destination = INDEX_PAGE;
+                    break;
+                default: 
                     request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
-                }
             }
             
         } catch (Exception e) {
@@ -131,6 +169,7 @@ public class AuthorController extends HttpServlet {
                 = getServletContext().getRequestDispatcher(destination);
         dispatcher.forward(request, response);
     }
+    
     
     private void refreshAuthorsList(HttpServletRequest request, AuthorService service) 
             throws ClassNotFoundException, SQLException{
@@ -173,6 +212,13 @@ public class AuthorController extends HttpServlet {
             return new AuthorService(authorDao);
     }
     
+    /**
+     * Initializes the variables with the correct servlet context information
+     * from the web.xml file. This allows for dependency inject to be done one
+     * time when the control is first initialized.
+     * 
+     * @throws ServletException 
+     */
     @Override
     public void init() throws ServletException{
         dbClassName = this.getServletContext().getInitParameter("dbStrategy");

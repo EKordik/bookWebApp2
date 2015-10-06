@@ -24,3 +24,19 @@ a:hover{
     color: aliceblue;
     text-decoration: none;
 }
+
+.indexForm{
+    display: inline;
+    float: left;
+    margin-right: 10px;
+}
+
+.btnSpacing{
+    width: 150px;
+    margin-bottom: 10px;
+}
+
+td{
+    padding-left: 3px;
+    padding-right: 3px;
+}

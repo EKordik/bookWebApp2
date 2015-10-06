@@ -2,7 +2,7 @@
     Document   : listAuthors
     Created on : Sep 23, 2015, 8:44:05 PM
     Author     : ekordik
-    Purpose    :
+    Purpose    : Allows an author to be edited
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -27,9 +27,12 @@
             <div class="row">
                 <nav class="col-xs-3">
                     <div class="fixed">
-                        <ul>
-                            <li><a href="AuthorController?action=list">View all Authors</a></li>
-                        </ul>
+                       <form method="POST" action="AuthorController?action=home">
+                            <button type="submit" class="btn ${btnClass} btnSpacing">Home</button>
+                        </form>
+                        <form method="POST" action="AuthorController?action=list" class="indexForm">
+                            <button type="submit" class="btn ${btnClass} btnSpacing">View All Authors</button>
+                        </form>
                     </div>
                 </nav>
                 <div class="col-xs-9">
@@ -40,7 +43,7 @@
                         <input type="text" name="updateName" id="updateName" value="${author.authorName}"><br>
                         <label for="updateDate">Date Added:</label>
                         <input type="date" name="updateDate" id="updateDate" value="${author.dateCreated}"><br>
-                        <input type="submit" value="Update Author" class="btn btn-info">
+                        <input type="submit" value="Update Author" class="btn ${btnClass}">
                     </form>
 
                 </div>

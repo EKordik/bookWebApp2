@@ -6,7 +6,8 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 /**
- *
+ * A Strategy that allows us to connect to various types of databases.
+ * 
  * @author emmakordik
  */
 public interface DatabaseStrategy {
