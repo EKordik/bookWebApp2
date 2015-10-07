@@ -169,7 +169,7 @@ public class AuthorDAO implements IAuthorDAO {
         
         colValues.add(authorName);
         
-        if(date != null){
+        if(date != null && !date.isEmpty()){
             colValues.add(stf.parse(date));
         }else{
             colValues.add(stf.format(new Date()));

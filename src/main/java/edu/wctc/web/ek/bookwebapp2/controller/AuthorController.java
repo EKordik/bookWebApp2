@@ -108,11 +108,13 @@ public class AuthorController extends HttpServlet {
                 case ADD_ACTION:
                     authorName = request.getParameter("addName");
                     
-                    if(request.getParameter("addDate") == null){
-                        date = "";
-                    }else{
+                    try{
                         date = request.getParameter("addDate");
+                    }catch(NullPointerException npe){
+                        date = "";
+                        System.out.println("Exception Caught");
                     }
+                    
                     service.saveAuthor(authorName, date);
                 
                     refreshAuthorsList(request, service);

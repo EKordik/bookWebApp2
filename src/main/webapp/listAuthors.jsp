@@ -32,7 +32,7 @@
                             <button type="submit" class="btn ${btnClass} btnSpacing">Home</button>
                         </form>
                         <button type="button" class="btn ${btnClass} btnSpacing" data-toggle="modal" href="#updateModal2">Update Author</button>
-                        <button type="button" class="btn ${btnClass} btnSpacing" data-toggle="modal" href="#uinsertModal">Add Author</button>
+                        <button type="button" class="btn ${btnClass} btnSpacing" data-toggle="modal" href="#insertModal">Add Author</button>
                     </div>
                 </nav>
                 <div class="col-xs-9">
@@ -103,8 +103,8 @@
               <label for="addName">Author Name:</label>
               <input type="text" name="addName" id="addName"><br>
               <label for="addDate">Date Added:</label>
-              <input type="date" name="addDate" id="addDate" value="e.g. 2015-09-02"><br>
-              <input type="submit" value="Save Author">
+              <input type="date" name="addDate" id="addDate" placeholder="e.g. 2015-09-02"><br>
+              <input type="submit" value="Save Author" class="btn ${btnClass}">
         </form>
       </div>
       <div class="modal-footer">
