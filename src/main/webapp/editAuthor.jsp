@@ -43,7 +43,7 @@
                         <input type="text" name="updateName" id="updateName" value="${author.authorName}"><br>
                         <label for="updateDate">Date Added:</label>
                         <input type="date" name="updateDate" id="updateDate" value="${author.dateCreated}"><br>
-                        <input type="submit" value="Update Author" class="btn ${btnClass}">
+                        <input type="submit" name="submitUpdate" id="submitUpdate" value="Update Author" class="btn ${btnClass}">
                     </form>
 
                 </div>
@@ -52,6 +52,8 @@
 
         <script src="http://code.jquery.com/jquery-latest.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script> 
+        <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
+        <script src="bookWepApp.js"></script>
       
     </body>
 </html>

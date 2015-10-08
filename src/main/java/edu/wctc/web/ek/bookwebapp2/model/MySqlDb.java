@@ -263,7 +263,6 @@ public class MySqlDb implements DatabaseStrategy {
         
         final String sqlStmt = sql.toString();
         PreparedStatement stmt = conn.prepareStatement(sqlStmt);
-        System.out.println(sqlStmt);
         return stmt;
     }
     
@@ -283,7 +282,6 @@ public class MySqlDb implements DatabaseStrategy {
         }
         
         final String sqlStmt = (sql.toString()).substring(0,(sql.toString()).lastIndexOf(",")) + ");";
-        System.out.println(sqlStmt);
         
         PreparedStatement stmt = conn.prepareStatement(sqlStmt);
         

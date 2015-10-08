@@ -31,7 +31,7 @@
                         <form method="POST" action="AuthorController?action=home">
                             <button type="submit" class="btn ${btnClass} btnSpacing">Home</button>
                         </form>
-                        <button type="button" class="btn ${btnClass} btnSpacing" data-toggle="modal" href="#updateModal2">Update Author</button>
+                      <!--  <button type="button" class="btn ${btnClass} btnSpacing" data-toggle="modal" href="#updateModal2">Update Author</button>-->
                         <button type="button" class="btn ${btnClass} btnSpacing" data-toggle="modal" href="#insertModal">Add Author</button>
                     </div>
                 </nav>
@@ -104,7 +104,7 @@
               <input type="text" name="addName" id="addName"><br>
               <label for="addDate">Date Added:</label>
               <input type="date" name="addDate" id="addDate" placeholder="e.g. 2015-09-02"><br>
-              <input type="submit" value="Save Author" class="btn ${btnClass}">
+              <input type="submit" id="addAuthor" name="addAuthor" value="Save Author" class="btn ${btnClass}">
         </form>
       </div>
       <div class="modal-footer">
@@ -114,7 +114,7 @@
   </div>
 </div><!--End Modal-->
   <!-- Update Link Modal -->
-<div class="modal fade" id="updateModal2" tabindex="-1" role="dialog" aria-labelledby="Update">
+<!--<div class="modal fade" id="updateModal2" tabindex="-1" role="dialog" aria-labelledby="Update">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -132,7 +132,7 @@
               <input type="text" name="updateName" id="updateName"><br>
               <label for="updateDate">Date Added:</label>
               <input type="date" name="updateDate" id="updateDate"><p>e.g.YYYY-MM-DD</p><br>
-              <input type="submit" value="Update Author">
+              <input type="submit" value="Update Author" id="updateAuthor" name="updateAuthor">
         </form>
       </div>
       <div class="modal-footer">
@@ -143,6 +143,8 @@
 </div><!--End Modal-->
         <script src="http://code.jquery.com/jquery-latest.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script> 
+        <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
+        <script src="bookWepApp.js"></script>
        
     </body>
 </html>
