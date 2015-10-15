@@ -41,8 +41,6 @@
                         <input type="hidden" name="updateId" value="${author.authorId}">
                         <label for="updateName">Author Name:</label>
                         <input type="text" name="updateName" id="updateName" value="${author.authorName}"><br>
-                        <label for="updateDate">Date Added:</label>
-                        <input type="date" name="updateDate" id="updateDate" value="${author.dateCreated}"><br>
                         <input type="submit" name="submitUpdate" id="submitUpdate" value="Update Author" class="btn ${btnClass}">
                     </form>
 

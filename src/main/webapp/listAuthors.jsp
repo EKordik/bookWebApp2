@@ -103,7 +103,6 @@
               <label for="addName">Author Name:</label>
               <input type="text" name="addName" id="addName"><br>
               <label for="addDate">Date Added:</label>
-              <input type="date" name="addDate" id="addDate" placeholder="e.g. 2015-09-02"><br>
               <input type="submit" id="addAuthor" name="addAuthor" value="Save Author" class="btn ${btnClass}">
         </form>
       </div>

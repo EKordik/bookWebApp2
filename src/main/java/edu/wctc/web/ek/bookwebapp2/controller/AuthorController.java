@@ -1,21 +1,15 @@
 package edu.wctc.web.ek.bookwebapp2.controller;
 
-import edu.wctc.web.ek.bookwebapp2.model.Author;
-import edu.wctc.web.ek.bookwebapp2.model.AuthorDAO;
-import edu.wctc.web.ek.bookwebapp2.model.IAuthorDAO;
-import edu.wctc.web.ek.bookwebapp2.model.AuthorService;
-//import edu.wctc.web.demo.bookwebapp.model.ConnPoolAuthorDao;
-import edu.wctc.web.ek.bookwebapp2.model.DatabaseStrategy;
-import edu.wctc.web.ek.bookwebapp2.model.MySqlDb;
+
+import edu.wctc.web.ek.bookwebapp2.entity.Author;
+import edu.wctc.web.ek.bookwebapp2.service.AuthorFacade;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import javax.naming.Context;
-import javax.naming.InitialContext;
+import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -23,7 +17,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
 
 /**
  * The main controller for author-related activities. This class determines
@@ -51,13 +44,10 @@ public class AuthorController extends HttpServlet {
     private static final String PREF_SET_ACTION = "setPref";
     private static final String HOME_ACTION = "home";
     private static final String DEFAULT_BTN_CLASS = "btn-primary";
-    private String dbClassName;
-    private String driverClass;
-    private String url;
-    private String userName;
-    private String password;
-    private String authorDAOClassName;
-    private String jndiName;
+
+    
+    @Inject
+    private AuthorFacade service;
     
     //Sets a session object with a default theme for the page. This can be changed by the user
     String themeColor = null;
@@ -93,56 +83,55 @@ public class AuthorController extends HttpServlet {
         String authorID;
         String authorName;
         String date;
+        Author author = new Author();
+        DateFormat format = new SimpleDateFormat();
+        
         try {
             
-            AuthorService service = injectDependencesGetAuthorService();
-
             /*
              Determine what action to take based on a passed on QueryString
              Parameter
              */
             switch(action){
-                case LIST_ACTION: {
+                case LIST_ACTION: 
                     refreshAuthorsList(request, service);
-                }break;
+                    break;
                 case ADD_ACTION:
+                    
                     authorName = request.getParameter("addName");
+
+                    author.setAuthorName(authorName);
                     
-                    try{
-                        date = request.getParameter("addDate");
-                    }catch(NullPointerException npe){
-                        date = "";
-                        System.out.println("Exception Caught");
-                    }
+                   author.setDateCreated(new Date());
                     
-                    service.saveAuthor(authorName, date);
+                    service.edit(author);
                 
                     refreshAuthorsList(request, service);
                     break;
                 case DELETE_ACTION: 
                     authorID = request.getParameter("deleteAuthor");
-                    service.deleteAuthor(authorID);
-                
-                    List<Author> authors = null;
-                    authors = service.getAllAuthors();
-                
-                    request.setAttribute("authors", authors);
+                    author = service.find(new Integer(authorID));
+                    service.remove(author);
+                    
+                    refreshAuthorsList(request, service);
                     break;
                 case UPDATE_ACTION: 
                     authorName = request.getParameter("updateName");
-                    date = request.getParameter("updateDate");
                     authorID = request.getParameter("updateId");
-                
-                    service.updateAuthor(authorID, authorName, date);
+                    
+                    Author a = service.find(new Integer(authorID));
+                    a.setAuthorName(authorName);
+                    
+                    service.edit(a);
                 
                     refreshAuthorsList(request, service);
                     destination = LIST_PAGE;
                     break;
                 case UPDATE_FIND_ACTION:
                     authorID = request.getParameter("updateAuthor");
-                    Author a = service.getAuthorbyId(authorID);
+                    author = service.find(new Integer(authorID));
                     
-                    request.setAttribute("author", a);
+                    request.setAttribute("author", author);
                     destination = UPDATE_PAGE;
                     break;
                 case PREF_ACTION:
@@ -173,46 +162,12 @@ public class AuthorController extends HttpServlet {
     }
     
     
-    private void refreshAuthorsList(HttpServletRequest request, AuthorService service) 
+    private void refreshAuthorsList(HttpServletRequest request, AuthorFacade service) 
             throws ClassNotFoundException, SQLException{
-            List<Author> authors = service.getAllAuthors();
+            List<Author> authors = service.findAll();
             request.setAttribute("authors", authors);   
     }
 
-    private AuthorService injectDependencesGetAuthorService() throws Exception{
-            
-            Class dbClass = Class.forName(dbClassName);
-            DatabaseStrategy db =  (DatabaseStrategy)dbClass.newInstance();
-            
-            IAuthorDAO authorDao;
-            Class daoClass = Class.forName(authorDAOClassName);
-            Constructor constructor = null;
-            try{
-                constructor = daoClass.getConstructor(new Class[] {
-                DatabaseStrategy.class, String.class, String.class, String.class, String.class});
-            }catch(NoSuchMethodException nsme){
-                //Nothing needs done here
-            }   
-            
-            if(constructor != null){
-                Object[] constructorArgs = new Object[]{db, driverClass, url, userName, password};
-                authorDao = (IAuthorDAO)constructor.newInstance(constructorArgs);
-                
-            }else{
-                Context ctx = new InitialContext();
-                DataSource ds = (DataSource)ctx.lookup(jndiName);
-                constructor = daoClass.getConstructor(new Class[]{
-                    DataSource.class,DatabaseStrategy.class});
-                Object[] constructorArgs = new Object[]{
-                    ds,db
-                };
-                
-                authorDao = (IAuthorDAO)constructor.newInstance(constructorArgs);
-                
-            }
-            
-            return new AuthorService(authorDao);
-    }
     
     /**
      * Initializes the variables with the correct servlet context information
@@ -223,13 +178,7 @@ public class AuthorController extends HttpServlet {
      */
     @Override
     public void init() throws ServletException{
-        dbClassName = this.getServletContext().getInitParameter("dbStrategy");
-        driverClass = this.getServletContext().getInitParameter("driverClass");
-        url = this.getServletContext().getInitParameter("url");
-        userName = this.getServletContext().getInitParameter("username");
-        password = this.getServletContext().getInitParameter("password");
-        authorDAOClassName = this.getServletContext().getInitParameter("authorDAO");
-        jndiName = this.getServletContext().getInitParameter("dataSource");
+      
     }
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
