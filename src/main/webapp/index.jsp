@@ -31,6 +31,9 @@
                                 <form method="POST" action="AuthorController?action=list" class="indexForm">
                                     <button type="submit" class="btn btn-primary btnSpacing">View All Authors</button>
                                 </form>
+                                <form method="POST" action="BookController?action=list" class="indexForm">
+                                    <button type="submit" class="btn btn-primary btnSpacing">View All Books</button>
+                                </form>
                                 <form method="POST" action="AuthorController?action=preference" class="indexForm">
                                     <button type="submit" class="btn btn-primary btnSpacing">Preferences</button>
                                 </form>
@@ -39,6 +42,9 @@
                                 <c:otherwise>
                                 <form method="POST" action="AuthorController?action=list" class="indexForm">
                                     <button type="submit" class="btn ${btnClass} btnSpacing">View All Authors</button>
+                                </form>
+                                <form method="POST" action="BookController?action=list" class="indexForm">
+                                    <button type="submit" class="btn btn-primary btnSpacing">View All Books</button>
                                 </form>
                                 <form method="POST" action="AuthorController?action=preference" class="indexForm">
                                     <button type="submit" class="btn ${btnClass} btnSpacing">Preferences</button>

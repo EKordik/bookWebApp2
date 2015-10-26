@@ -83,7 +83,7 @@ public class AuthorController extends HttpServlet {
         String authorID;
         String authorName;
         String date;
-        Author author = new Author();
+        Author author;
         DateFormat format = new SimpleDateFormat();
         
         try {
@@ -97,11 +97,9 @@ public class AuthorController extends HttpServlet {
                     refreshAuthorsList(request, service);
                     break;
                 case ADD_ACTION:
-                    
                     authorName = request.getParameter("addName");
-
-                    author.setAuthorName(authorName);
-                    
+                    author = new Author(0);
+                    author.setAuthorName(authorName);                  
                    author.setDateCreated(new Date());
                     
                     service.edit(author);

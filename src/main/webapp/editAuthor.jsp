@@ -39,6 +39,16 @@
                     <h3>Edit Author with ID ${author.authorId}</h3>
                     <form method="POST" action="AuthorController?action=update" id="updateForm" name="updateForm">
                         <input type="hidden" name="updateId" value="${author.authorId}">
+                        <c:choose>
+                        <c:when test="${not empty author.bookSet}">
+                            <label for='booksDropDown'>Books:</label>
+                            <select name="bookId" id="booksDropDown">
+                                <c:forEach var="book" items="${author.bookSet}" varStatus = "rowCount">
+                                    <option value="${book.bookId}">${book.title}</option>
+                                </c:forEach>
+                            </select><br>
+                        </c:when>
+                        </c:choose>
                         <label for="updateName">Author Name:</label>
                         <input type="text" name="updateName" id="updateName" value="${author.authorName}"><br>
                         <input type="submit" name="submitUpdate" id="submitUpdate" value="Update Author" class="btn ${btnClass}">
