@@ -32,8 +32,10 @@ public class AuthorController extends HttpServlet {
     private static final String NO_PARAM_ERR_MSG = "No request parameter identified";
     private static final String LIST_PAGE = "/listAuthors.jsp";
     private static final String INDEX_PAGE = "/index.jsp";
+    private static final String BOOK_ADD_PAGE = "/editAddBook.jsp";
     private static final String LIST_ACTION = "list";
     private static final String ADD_ACTION = "insert";
+    private static final String ADD_FROM_BOOK_ACTION = "addAuthor";
     private static final String UPDATE_ACTION = "update";
     private static final String DELETE_ACTION = "delete";
     private static final String ACTION_PARAM = "action";
@@ -100,11 +102,23 @@ public class AuthorController extends HttpServlet {
                     authorName = request.getParameter("addName");
                     author = new Author(0);
                     author.setAuthorName(authorName);                  
-                   author.setDateCreated(new Date());
+                    author.setDateCreated(new Date());
                     
                     service.edit(author);
                 
                     refreshAuthorsList(request, service);
+                    break;
+                case ADD_FROM_BOOK_ACTION:
+                    authorName = request.getParameter("addName");
+                    author = new Author(0);
+                    author.setAuthorName(authorName);                  
+                    author.setDateCreated(new Date());
+                    
+                    service.edit(author);
+                    
+                    request.setAttribute("newAuthor", authorName);
+                    request.setAttribute("Authors", service.findAll());
+                    destination = BOOK_ADD_PAGE;
                     break;
                 case DELETE_ACTION: 
                     authorID = request.getParameter("deleteAuthor");

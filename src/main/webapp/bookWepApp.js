@@ -1,4 +1,15 @@
 $(function(){
+    $("#author").change(function(){
+        var author = $('#author').val();
+        
+        if(author == "insert"){
+            $('#insertModal').modal('show');
+            console.log(author);
+        }else{
+            console.log(author);
+        }
+        
+    });
     
     $('#addAuthor').click(function(){
         var isValid = $('#insertForm').validate().form();

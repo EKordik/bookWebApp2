@@ -8,9 +8,11 @@ package edu.wctc.web.ek.bookwebapp2.controller;
 import edu.wctc.web.ek.bookwebapp2.entity.Author;
 import edu.wctc.web.ek.bookwebapp2.entity.Book;
 import edu.wctc.web.ek.bookwebapp2.service.AbstractFacade;
+import edu.wctc.web.ek.bookwebapp2.service.AuthorFacade;
 import edu.wctc.web.ek.bookwebapp2.service.BookFacade;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
@@ -38,12 +40,12 @@ public class BookController extends HttpServlet {
     private static final String FIND_AUTHOR_ACTION = "showByAuthor";
     private static final String UPDATE_PAGE = "/editAddBook.jsp";
     private static final String HOME_ACTION = "home";
-    
+    private static final String ADD_AUTHOR_ACTION = "addAuthor";
     @Inject
     private BookFacade bookService;
     
     @Inject
-    private AbstractFacade<Author> authService;
+    private AuthorFacade authService;
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
