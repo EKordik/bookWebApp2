@@ -2,21 +2,23 @@ package edu.wctc.web.ek.bookwebapp2.controller;
 
 
 import edu.wctc.web.ek.bookwebapp2.entity.Author;
-import edu.wctc.web.ek.bookwebapp2.service.AuthorFacade;
+import edu.wctc.web.ek.bookwebapp2.service.AuthorService;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * The main controller for author-related activities. This class determines
@@ -48,9 +50,6 @@ public class AuthorController extends HttpServlet {
     private static final String DEFAULT_BTN_CLASS = "btn-primary";
 
     
-    @Inject
-    private AuthorFacade service;
-    
     //Sets a session object with a default theme for the page. This can be changed by the user
     String themeColor = null;
 
@@ -68,6 +67,11 @@ public class AuthorController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");  
+        
+        ServletContext sctx = getServletContext();
+        WebApplicationContext ctx = 
+                WebApplicationContextUtils.getWebApplicationContext(sctx);
+        AuthorService authorService = (AuthorService) ctx.getBean("authorService");
         
         //Sets default color
         HttpSession session = request.getSession();
@@ -96,7 +100,7 @@ public class AuthorController extends HttpServlet {
              */
             switch(action){
                 case LIST_ACTION: 
-                    refreshAuthorsList(request, service);
+                    refreshAuthorsList(request, authorService);
                     break;
                 case ADD_ACTION:
                     authorName = request.getParameter("addName");
@@ -104,9 +108,9 @@ public class AuthorController extends HttpServlet {
                     author.setAuthorName(authorName);                  
                     author.setDateCreated(new Date());
                     
-                    service.edit(author);
+                    authorService.edit(author);
                 
-                    refreshAuthorsList(request, service);
+                    refreshAuthorsList(request, authorService);
                     break;
                 case ADD_FROM_BOOK_ACTION:
                     authorName = request.getParameter("addName");
@@ -114,34 +118,34 @@ public class AuthorController extends HttpServlet {
                     author.setAuthorName(authorName);                  
                     author.setDateCreated(new Date());
                     
-                    service.edit(author);
+                    authorService.edit(author);
                     
                     request.setAttribute("newAuthor", authorName);
-                    request.setAttribute("Authors", service.findAll());
+                    request.setAttribute("Authors", authorService.findAll());
                     destination = BOOK_ADD_PAGE;
                     break;
                 case DELETE_ACTION: 
                     authorID = request.getParameter("deleteAuthor");
-                    author = service.find(new Integer(authorID));
-                    service.remove(author);
+                    author = authorService.findById(authorID);
+                    authorService.remove(author);
                     
-                    refreshAuthorsList(request, service);
+                    refreshAuthorsList(request, authorService);
                     break;
                 case UPDATE_ACTION: 
                     authorName = request.getParameter("updateName");
                     authorID = request.getParameter("updateId");
                     
-                    Author a = service.find(new Integer(authorID));
+                    Author a = authorService.findById(authorID);
                     a.setAuthorName(authorName);
                     
-                    service.edit(a);
+                    authorService.edit(a);
                 
-                    refreshAuthorsList(request, service);
+                    refreshAuthorsList(request, authorService);
                     destination = LIST_PAGE;
                     break;
                 case UPDATE_FIND_ACTION:
                     authorID = request.getParameter("updateAuthor");
-                    author = service.find(new Integer(authorID));
+                    author = authorService.findById(authorID);
                     
                     request.setAttribute("author", author);
                     destination = UPDATE_PAGE;
@@ -174,7 +178,7 @@ public class AuthorController extends HttpServlet {
     }
     
     
-    private void refreshAuthorsList(HttpServletRequest request, AuthorFacade service) 
+    private void refreshAuthorsList(HttpServletRequest request, AuthorService service) 
             throws ClassNotFoundException, SQLException{
             List<Author> authors = service.findAll();
             request.setAttribute("authors", authors);   
