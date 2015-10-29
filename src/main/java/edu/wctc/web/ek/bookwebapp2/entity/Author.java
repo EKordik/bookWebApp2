@@ -7,12 +7,14 @@ import javax.persistence.Basic;
 import static javax.persistence.CascadeType.ALL;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.PostUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -45,7 +47,7 @@ public class Author implements Serializable {
     @Column(name = "date_created")
     @Temporal(TemporalType.DATE)
     private Date dateCreated;
-    @OneToMany(mappedBy = "authorId", cascade=ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "authorId", cascade=ALL)
     private Set<Book> bookSet;
 
     public Author() {
@@ -53,6 +55,11 @@ public class Author implements Serializable {
 
     public Author(Integer authorId) {
         this.authorId = authorId;
+    }
+
+    @PostUpdate
+    public void logger(){
+        System.out.println("Stored in Database");
     }
 
     public Integer getAuthorId() {

@@ -35,7 +35,6 @@ public class BookController extends HttpServlet {
     private static final String FIND_AUTHOR_ACTION = "showByAuthor";
     private static final String UPDATE_PAGE = "/editAddBook.jsp";
     private static final String HOME_ACTION = "home";
-    private static final String ADD_AUTHOR_ACTION = "addAuthor";
    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -119,13 +118,13 @@ public class BookController extends HttpServlet {
                 case FIND_AUTHOR_ACTION:
                     destination = LIST_PAGE;
                     String authorName = request.getParameter("searchAuthor");
-                   // List<Book> books = bookService.findBooksbyAuthor(authorName);
-//                    if(books.size() == 0){
-//                        request.setAttribute("errMsg", "Author has no books. Check that the name is entered correctly");
-//                    }else{
-//                        request.setAttribute("books", books);
-//                        request.setAttribute("search", "author");
-//                    }
+                    List<Book> books = bookService.findBooksforAuthor(authorName);
+                    if(books.isEmpty()){
+                        request.setAttribute("errMsg", "Author has no books. Check that the name is entered correctly");
+                    }else{
+                        request.setAttribute("books", books);
+                        request.setAttribute("search", "author");
+                    }
                     break;
                 case HOME_ACTION:
                     destination = INDEX_PAGE;

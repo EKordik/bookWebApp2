@@ -39,8 +39,8 @@
                     <h3>Edit Author with ID ${author.authorId}</h3>
                     <form method="POST" action="AuthorController?action=update" id="updateForm" name="updateForm">
                         <input type="hidden" name="updateId" value="${author.authorId}">
-                        <c:choose>
-                        <c:when test="${not empty author.bookSet}">
+                           <c:choose>
+                            <c:when test="${not empty author.bookSet}">
                             <label for='booksDropDown'>Books:</label>
                             <select name="bookId" id="booksDropDown">
                                 <c:forEach var="book" items="${author.bookSet}" varStatus = "rowCount">

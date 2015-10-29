@@ -40,6 +40,8 @@ public class Book implements Serializable {
     @Size(max = 45)
     @Column(name = "isbn")
     private String isbn;
+//    private Integer authorId; //foreign key if not using @ManyToOne and doing two queries
+    
     @JoinColumn(name = "author_id", referencedColumnName = "author_id")
     @ManyToOne
     private Author authorId;

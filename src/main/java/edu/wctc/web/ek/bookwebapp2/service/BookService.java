@@ -39,6 +39,10 @@ public class BookService {
         return bookRepo.findOne(new Integer(id));
     }
     
+    public List<Book> findBooksforAuthor(String authorName){
+        return bookRepo.findBooksforAuthor(authorName);
+    }
+    
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     public void remove(Book book) {
         LOG.debug("Deleting book: " + book.getTitle());

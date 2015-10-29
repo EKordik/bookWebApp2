@@ -39,6 +39,10 @@ public class AuthorService {
         return authorRepo.findOne(new Integer(id));
     }
     
+    public Author findByIdAndLoadBooks(String id){
+        Integer authorId = new Integer(id);
+        return authorRepo.findByIdAndFetchBooksEagerly(authorId);
+    }
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     public void remove(Author author){
         LOG.debug("Deleting author: " + author.getAuthorName());

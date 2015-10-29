@@ -135,7 +135,7 @@ public class AuthorController extends HttpServlet {
                     authorName = request.getParameter("updateName");
                     authorID = request.getParameter("updateId");
                     
-                    Author a = authorService.findById(authorID);
+                    Author a = authorService.findByIdAndLoadBooks(authorID);
                     a.setAuthorName(authorName);
                     
                     authorService.edit(a);
@@ -145,7 +145,7 @@ public class AuthorController extends HttpServlet {
                     break;
                 case UPDATE_FIND_ACTION:
                     authorID = request.getParameter("updateAuthor");
-                    author = authorService.findById(authorID);
+                    author = authorService.findByIdAndLoadBooks(authorID);
                     
                     request.setAttribute("author", author);
                     destination = UPDATE_PAGE;
