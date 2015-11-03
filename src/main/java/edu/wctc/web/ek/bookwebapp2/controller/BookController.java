@@ -117,14 +117,16 @@ public class BookController extends HttpServlet {
                     break;
                 case FIND_AUTHOR_ACTION:
                     destination = LIST_PAGE;
-                    String authorName = request.getParameter("searchAuthor");
-                    List<Book> books = bookService.findBooksforAuthor(authorName);
+                    String searchTerm = request.getParameter("searchAuthor");
+                    List<Book> books = bookService.searchBooks(searchTerm);
+                   
                     if(books.isEmpty()){
                         request.setAttribute("errMsg", "Author has no books. Check that the name is entered correctly");
                     }else{
                         request.setAttribute("books", books);
                         request.setAttribute("search", "author");
                     }
+                    
                     break;
                 case HOME_ACTION:
                     destination = INDEX_PAGE;

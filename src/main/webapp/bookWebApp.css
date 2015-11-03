@@ -40,3 +40,8 @@ td{
     padding-left: 3px;
     padding-right: 3px;
 }
+
+.bookForm{
+    margin-bottom: 10px;
+    float: right;
+}

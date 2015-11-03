@@ -3,6 +3,7 @@ package edu.wctc.web.ek.bookwebapp2.service;
 import edu.wctc.web.ek.bookwebapp2.entity.Book;
 import edu.wctc.web.ek.bookwebapp2.repository.AuthorRepository;
 import edu.wctc.web.ek.bookwebapp2.repository.BookRepository;
+import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,20 @@ public class BookService {
         return bookRepo.findBooksforAuthor(authorName);
     }
     
+    public List<Book> searchBooks(String searchTerm){
+        List<Book> books = bookRepo.findBooksforAuthor(searchTerm);
+        
+        if(books.isEmpty()){
+            books = bookRepo.findBooksByTitle(searchTerm);
+        }
+        
+        if(books.isEmpty()){
+            books = bookRepo.findBooksByIsbn(searchTerm);
+        }
+        
+        return books;
+    }
+   
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     public void remove(Book book) {
         LOG.debug("Deleting book: " + book.getTitle());

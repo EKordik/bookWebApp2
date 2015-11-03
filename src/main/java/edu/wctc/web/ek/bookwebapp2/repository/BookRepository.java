@@ -15,4 +15,8 @@ public interface BookRepository extends JpaRepository<Book, Integer>, Serializab
     
     @Query("SELECT b from Book b WHERE b.authorId.authorName = (:name)")
     public List<Book> findBooksforAuthor(@Param("name") String authorName);
+    
+    public List<Book>findBooksByTitle(String title);
+    
+    public List<Book>findBooksByIsbn(String isbn);
 }

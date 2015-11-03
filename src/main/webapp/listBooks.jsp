@@ -37,11 +37,12 @@
                     </div>
                 </nav>
                 <div class="col-xs-9">
-                    <form method="POST" action="BookController?action=showByAuthor">
-                        <input type="text" name="searchAuthor" id="searchAuthor" placeholder="Author Name">
-                        <input type="submit" name="searchSubmit" id="searchSubmit" value="Search">
+                    <form method="POST" action="BookController?action=showByAuthor" class="form-inline bookForm">
+                        <input type="text" name="searchAuthor" id="searchAuthor" placeholder="Search Term" class="form-control">
+                        <input type="submit" name="searchSubmit" id="searchSubmit" value="Search" class="btn btn-info">
                     </form>
-                    <table width="500" border="1" cellspacing="0" cellpadding="4">
+        
+                    <table width="700" border="1" cellspacing="0" cellpadding="4">
                         <tr style="background-color: black; color:white;">
                             <th align="left" class="tableHead">ID</th>
                             <th align="left" class="tableHead">Title</th>
