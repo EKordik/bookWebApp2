@@ -10,13 +10,15 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+
 
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-        <link rel="stylesheet" href="bookWebApp.css">
+        <link rel="stylesheet" href="resources/css/bookWebApp.css">
         <title>Author List</title>
 
     </head>
@@ -29,11 +31,13 @@
                 <nav class="col-xs-3">
                     <div class="fixed">
                         <form method="POST" action="AuthorController?action=home">
+                            <sec:csrfInput />
                             <button type="submit" class="btn ${btnClass} btnSpacing">Home</button>
                         </form>
-                      <!--  <button type="button" class="btn ${btnClass} btnSpacing" data-toggle="modal" href="#updateModal2">Update Author</button>-->
-                        <button type="button" class="btn ${btnClass} btnSpacing" data-toggle="modal" href="#insertModal">Add Author</button>
-                    </div>
+                            <sec:authorize access="hasAnyRole('ROLE_MGR')">
+                            <button type="button" class="btn ${btnClass} btnSpacing" data-toggle="modal" href="#insertModal">Add Author</button>
+                            </sec:authorize>
+                            </div>
                 </nav>
                 <div class="col-xs-9">
                     <table width="500" border="1" cellspacing="0" cellpadding="4">
@@ -58,8 +62,10 @@
                                 <td align="right">
                                     <fmt:formatDate pattern="M/d/yyyy" value="${a.dateCreated}"></fmt:formatDate>
                                 </td>
+                                 <sec:authorize access="hasAnyRole('ROLE_MGR')">
                                 <td align="center">
                                     <form name="deleteForm" method="POST" action="AuthorController?action=delete">
+                                        <sec:csrfInput />
                                         <button href="AuthorController?action=delete" name="deleteAuthor" value="${a.authorId}">
                                             <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                                             <span class="sr-only">Delete</span>
@@ -67,7 +73,8 @@
                                     </form>
                                 </td>
                                 <td align="center">
-                                    <form name="updateForm" method="POST" action="AuthorController?action=findUpdate">                                            
+                                    <form name="updateForm" method="POST" action="AuthorController?action=findUpdate">  
+                                        <sec:csrfInput />
                                         <button id="updateAuthor" name="updateAuthor" value="${a.authorId}">
                                             <c:set var="updateId" value="${a.authorId}"/>
                                             <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
@@ -75,6 +82,7 @@
                                         </button>
                                     </form>
                                 </td>
+                                 </sec:authorize>
                             </tr>
                         </c:forEach>
                     </table>
@@ -87,7 +95,10 @@
                 </div>
             </div>
             
-            
+            <sec:authorize access="hasAnyRole('ROLE_MGR','ROLE_USER')">
+                Logged in as: <sec:authentication property="principal.username"></sec:authentication> ::
+                <a href='<%= this.getServletContext().getContextPath() + "/j_spring_security_logout"%>'>Log Me Out</a>
+            </sec:authorize>     
         </div>
  
          <!-- Insert Modal -->

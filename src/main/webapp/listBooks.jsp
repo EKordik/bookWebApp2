@@ -10,13 +10,14 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-        <link rel="stylesheet" href="bookWebApp.css">
+        <link rel="stylesheet" href="resources/css/bookWebApp.css">
         <title>Book List</title>
 
     </head>
@@ -29,15 +30,18 @@
                 <nav class="col-xs-3">
                     <div class="fixed">
                         <form method="POST" action="BookController?action=home">
+                            <sec:csrfInput />
                             <button type="submit" class="btn ${btnClass} btnSpacing">Home</button>
                         </form>
                         <form method="POST" action="BookController?action=updateAdd">
+                            <sec:csrfInput />
                             <button type="submit" class="btn ${btnClass} btnSpacing" data-toggle="modal">Add Book</button>
                         </form>
                     </div>
                 </nav>
                 <div class="col-xs-9">
                     <form method="POST" action="BookController?action=showByAuthor" class="form-inline bookForm">
+                        <sec:csrfInput />
                         <input type="text" name="searchAuthor" id="searchAuthor" placeholder="Search Term" class="form-control">
                         <input type="submit" name="searchSubmit" id="searchSubmit" value="Search" class="btn btn-info">
                     </form>
@@ -66,8 +70,10 @@
                                     ${b.isbn}
                                 </td>
                                 <td align="left">${b.authorId.authorName}</td>
+                                 <sec:authorize access="hasAnyRole('ROLE_MGR')">
                                 <td align="center">
                                     <form name="deleteForm" method="POST" action="BookController?action=delete">
+                                        <sec:csrfInput />
                                         <button name="deleteBook" value="${b.bookId}">
                                             <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                                             <span class="sr-only">Delete</span>
@@ -75,7 +81,8 @@
                                     </form>
                                 </td>
                                 <td align="center">
-                                    <form name="updateForm" method="POST" action="BookController?action=updateAdd">                                            
+                                    <form name="updateForm" method="POST" action="BookController?action=updateAdd">    
+                                        <sec:csrfInput />
                                         <button id="updateBook" name="updateBook" value="${b.bookId}">
                                             <c:set var="updateId" value="${b.bookId}"/>
                                             <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
@@ -83,6 +90,7 @@
                                         </button>
                                     </form>
                                 </td>
+                                </sec:authorize>
                             </tr>
                         </c:forEach>
                     </table>
@@ -99,7 +107,10 @@
                         </c:if>
                 </div>
             </div>
-            
+             <sec:authorize access="hasAnyRole('ROLE_MGR','ROLE_USER')">
+                Logged in as: <sec:authentication property="principal.username"></sec:authentication> ::
+                <a href='<%= this.getServletContext().getContextPath() + "/j_spring_security_logout"%>'>Log Me Out</a>
+            </sec:authorize>   
             
         </div>
 

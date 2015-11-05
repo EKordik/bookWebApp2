@@ -9,13 +9,15 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+
 
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-        <link rel="stylesheet" href="bookWebApp.css">
+        <link rel="stylesheet" href="resources/css/bookWebApp.css">
         <title>Edit Author</title>
 
     </head>
@@ -28,16 +30,23 @@
                 <nav class="col-xs-3">
                     <div class="fixed">
                        <form method="POST" action="AuthorController?action=home">
+                            <sec:csrfInput />
+
                             <button type="submit" class="btn ${btnClass} btnSpacing">Home</button>
                         </form>
                         <form method="POST" action="AuthorController?action=list" class="indexForm">
+                            <sec:csrfInput />
+
                             <button type="submit" class="btn ${btnClass} btnSpacing">View All Authors</button>
                         </form>
                     </div>
                 </nav>
                 <div class="col-xs-9">
+                    <sec:authorize access="hasAnyRole('ROLE_MGR')">
                     <h3>Edit Author with ID ${author.authorId}</h3>
                     <form method="POST" action="AuthorController?action=update" id="updateForm" name="updateForm">
+                        <sec:csrfInput />
+
                         <input type="hidden" name="updateId" value="${author.authorId}">
                            <c:choose>
                             <c:when test="${not empty author.bookSet}">
@@ -53,11 +62,17 @@
                         <input type="text" name="updateName" id="updateName" value="${author.authorName}"><br>
                         <input type="submit" name="submitUpdate" id="submitUpdate" value="Update Author" class="btn ${btnClass}">
                     </form>
-
+                    </sec:authorize>
                 </div>
             </div>
+                        
+        <sec:authorize access="hasAnyRole('ROLE_MGR','ROLE_USER')">
+                Logged in as: <sec:authentication property="principal.username"></sec:authentication> ::
+                <a href='<%= this.getServletContext().getContextPath() + "/j_spring_security_logout"%>'>Log Me Out</a>
+        </sec:authorize> 
         </div>
 
+  
         <script src="http://code.jquery.com/jquery-latest.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script> 
         <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>

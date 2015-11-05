@@ -8,13 +8,14 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-        <link rel="stylesheet" href="bookWebApp.css">
+        <link rel="stylesheet" href="resources/css/bookWebApp.css">
         <title>Edit Books</title>
 
     </head>
@@ -27,9 +28,11 @@
                 <nav class="col-xs-3">
                     <div class="fixed">
                         <form method="POST" action="BookController?action=home">
+                            <sec:csrfInput />
                             <button type="submit" class="btn ${btnClass} btnSpacing">Home</button>
                         </form>
                         <form method="POST" action="BookController?action=list" class="indexForm">
+                            <sec:csrfInput />
                             <button type="submit" class="btn ${btnClass} btnSpacing">View All Books</button>
                         </form>
                     </div>
@@ -37,6 +40,7 @@
                 <div class="col-xs-9">
                     <h3>Edit/Add Book</h3>
                     <form method="POST" action="BookController?action=addEdit" id="updateForm" name="updateForm">
+                        <sec:csrfInput />
                         <c:choose>
                             <c:when test="${not empty book}">
                                 <input type="hidden" name="updateId" value="${book.bookId}">
@@ -97,8 +101,14 @@
                     </c:if>    
                 </div>
             </div>
+                    
+            <sec:authorize access="hasAnyRole('ROLE_MGR','ROLE_USER')">
+                Logged in as: <sec:authentication property="principal.username"></sec:authentication> ::
+                <a href='<%= this.getServletContext().getContextPath() + "/j_spring_security_logout"%>'>Log Me Out</a>
+            </sec:authorize>  
         </div>
-
+ 
+                
         <!-- Insert Modal -->
         <div class="modal fade" id="insertModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document">
@@ -109,6 +119,7 @@
                     </div>
                     <div class="modal-body">
                         <form method="POST" action="BookController?action=addAuthor" id="insertForm" name="insertForm">
+                            <sec:csrfInput />
                             <label for="addName">Author Name:</label>
                             <input type="text" name="addName" id="addName">
                             <input type="submit" id="addAuthor" name="addAuthor" value="Save Author" class="btn ${btnClass}">
