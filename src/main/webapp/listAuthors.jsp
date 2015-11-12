@@ -34,10 +34,13 @@
                             <sec:csrfInput />
                             <button type="submit" class="btn ${btnClass} btnSpacing">Home</button>
                         </form>
-                            <sec:authorize access="hasAnyRole('ROLE_MGR')">
-                            <button type="button" class="btn ${btnClass} btnSpacing" data-toggle="modal" href="#insertModal">Add Author</button>
-                            </sec:authorize>
-                            </div>
+                        <sec:authorize access="hasAnyRole('ROLE_MGR', 'ROLE_ADMIN')">
+                            <form method="POST" action="AuthorController?action=insert">
+                                <sec:csrfInput />
+                                <button type="submit" class="btn ${btnClass} btnSpacing" data-toggle="modal" href="#insertModal">Add Author</button>
+                            </form>
+                        </sec:authorize>
+                    </div>
                 </nav>
                 <div class="col-xs-9">
                     <table width="500" border="1" cellspacing="0" cellpadding="4">
@@ -62,7 +65,7 @@
                                 <td align="right">
                                     <fmt:formatDate pattern="M/d/yyyy" value="${a.dateCreated}"></fmt:formatDate>
                                 </td>
-                                 <sec:authorize access="hasAnyRole('ROLE_MGR')">
+                                 <sec:authorize access="hasAnyRole('ROLE_MGR', 'ROLE_ADMIN')">
                                 <td align="center">
                                     <form name="deleteForm" method="POST" action="AuthorController?action=delete">
                                         <sec:csrfInput />
@@ -94,67 +97,16 @@
                         </c:if>
                 </div>
             </div>
-            
-            <sec:authorize access="hasAnyRole('ROLE_MGR','ROLE_USER')">
-                Logged in as: <sec:authentication property="principal.username"></sec:authentication> ::
-                <a href='<%= this.getServletContext().getContextPath() + "/j_spring_security_logout"%>'>Log Me Out</a>
-            </sec:authorize>     
+   
         </div>
+                        
+        <jsp:include page="footer.jsp"/> 
  
-         <!-- Insert Modal -->
-<div class="modal fade" id="insertModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Add Author</h4>
-      </div>
-      <div class="modal-body">
-          <form method="POST" action="AuthorController?action=insert" id="insertForm" name="insertForm">
-              <label for="addName">Author Name:</label>
-              <input type="text" name="addName" id="addName"><br>
-              <label for="addDate">Date Added:</label>
-              <input type="submit" id="addAuthor" name="addAuthor" value="Save Author" class="btn ${btnClass}">
-        </form>
-      </div>
-      <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div><!--End Modal-->
-  <!-- Update Link Modal -->
-<!--<div class="modal fade" id="updateModal2" tabindex="-1" role="dialog" aria-labelledby="Update">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Update Author</h4>
-      </div>
-      <div class="modal-body">
-          <form method="POST" action="AuthorController?action=update" id="updateForm2" name="updateForm2">
-              <select name="updateId">
-                  <c:forEach var="a" items="${authors}">
-                      <option value="${a.authorId}">${a.authorId}</option>
-                  </c:forEach>
-              </select>
-              <label for="updateName">Author Name:</label>
-              <input type="text" name="updateName" id="updateName"><br>
-              <label for="updateDate">Date Added:</label>
-              <input type="date" name="updateDate" id="updateDate"><p>e.g.YYYY-MM-DD</p><br>
-              <input type="submit" value="Update Author" id="updateAuthor" name="updateAuthor">
-        </form>
-      </div>
-      <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div><!--End Modal-->
+         
+
         <script src="http://code.jquery.com/jquery-latest.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script> 
-        <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
-        <script src="bookWepApp.js"></script>
+        <script src="/resources/js/bookWepApp.js"></script>
        
     </body>
 </html>

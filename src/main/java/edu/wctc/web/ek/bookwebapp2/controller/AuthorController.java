@@ -38,20 +38,13 @@ public class AuthorController extends HttpServlet {
     private static final String LIST_ACTION = "list";
     private static final String ADD_ACTION = "insert";
     private static final String ADD_FROM_BOOK_ACTION = "addAuthor";
-    private static final String UPDATE_ACTION = "update";
+    private static final String ADD_UPDATE_ACTION = "update";
     private static final String DELETE_ACTION = "delete";
     private static final String ACTION_PARAM = "action";
     private static final String UPDATE_FIND_ACTION = "findUpdate";
     private static final String UPDATE_PAGE = "/editAuthor.jsp";
-    private static final String PREFERENCE_PAGE = "/preferences.jsp";
-    private static final String PREF_ACTION = "preference";
-    private static final String PREF_SET_ACTION = "setPref";
     private static final String HOME_ACTION = "home";
-    private static final String DEFAULT_BTN_CLASS = "btn-primary";
 
-    
-    //Sets a session object with a default theme for the page. This can be changed by the user
-    String themeColor = null;
 
         
     /**
@@ -72,14 +65,7 @@ public class AuthorController extends HttpServlet {
         WebApplicationContext ctx = 
                 WebApplicationContextUtils.getWebApplicationContext(sctx);
         AuthorService authorService = (AuthorService) ctx.getBean("authorService");
-        
-        //Sets default color
-        HttpSession session = request.getSession();
-        
-        if(themeColor == null){
-            themeColor = "btn-primary";
-        }
-        session.setAttribute("btnClass", themeColor);
+
         
         //Sets a default page
         String destination = LIST_PAGE;
@@ -90,7 +76,7 @@ public class AuthorController extends HttpServlet {
         String authorName;
         String date;
         Author author;
-        DateFormat format = new SimpleDateFormat();
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         
         try {
             
@@ -103,14 +89,8 @@ public class AuthorController extends HttpServlet {
                     refreshAuthorsList(request, authorService);
                     break;
                 case ADD_ACTION:
-                    authorName = request.getParameter("addName");
-                    author = new Author(0);
-                    author.setAuthorName(authorName);                  
-                    author.setDateCreated(new Date());
                     
-                    authorService.edit(author);
-                
-                    refreshAuthorsList(request, authorService);
+                    destination = UPDATE_PAGE;
                     break;
                 case ADD_FROM_BOOK_ACTION:
                     authorName = request.getParameter("addName");
@@ -131,13 +111,26 @@ public class AuthorController extends HttpServlet {
                     
                     refreshAuthorsList(request, authorService);
                     break;
-                case UPDATE_ACTION: 
+                case ADD_UPDATE_ACTION: 
                     authorName = request.getParameter("updateName");
                     authorID = request.getParameter("updateId");
+                    date = request.getParameter("updateDate");
+                    Date dateAdd = date == null ? new Date() : format.parse(date);
                     
-                    Author a = authorService.findByIdAndLoadBooks(authorID);
-                    a.setAuthorName(authorName);
-                    
+                    Author a;
+                    if(authorID == null){
+                        a = new Author();
+                        a.setAuthorName(authorName);
+                        
+                        a.setDateCreated(dateAdd);
+                    }else{
+                        a = authorService.findByIdAndLoadBooks(authorID);
+                        a.setAuthorName(authorName);
+                        if(date != null){
+                            a.setDateCreated(dateAdd);
+                        }
+                        
+                    }
                     authorService.edit(a);
                 
                     refreshAuthorsList(request, authorService);
@@ -149,16 +142,6 @@ public class AuthorController extends HttpServlet {
                     
                     request.setAttribute("author", author);
                     destination = UPDATE_PAGE;
-                    break;
-                case PREF_ACTION:
-                    destination = PREFERENCE_PAGE;
-                    break;
-                case PREF_SET_ACTION:
-                    themeColor = request.getParameter("themeColor");
-
-                    session.setAttribute("btnClass", themeColor);
-
-                    destination = PREFERENCE_PAGE;
                     break;
                 case HOME_ACTION:
                     destination = INDEX_PAGE;

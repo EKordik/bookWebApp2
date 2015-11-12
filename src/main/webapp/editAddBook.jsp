@@ -38,6 +38,7 @@
                     </div>
                 </nav>
                 <div class="col-xs-9">
+                    <sec:authorize access="hasAnyRole('ROLE_MGR', ROLE_ADMIN')">
                     <h3>Edit/Add Book</h3>
                     <form method="POST" action="BookController?action=addEdit" id="updateForm" name="updateForm">
                         <sec:csrfInput />
@@ -98,17 +99,15 @@
                             <p style="font-weight: bold;color: red;width:500px;">Sorry, data could not be retrieved:<br>
                                 ${errMsg}</p>
                         </div>
-                    </c:if>    
+                    </c:if>  
+                    </sec:authorize>
                 </div>
             </div>
                     
-            <sec:authorize access="hasAnyRole('ROLE_MGR','ROLE_USER')">
-                Logged in as: <sec:authentication property="principal.username"></sec:authentication> ::
-                <a href='<%= this.getServletContext().getContextPath() + "/j_spring_security_logout"%>'>Log Me Out</a>
-            </sec:authorize>  
         </div>
  
-                
+              
+         <jsp:include page="footer.jsp"/>           
         <!-- Insert Modal -->
         <div class="modal fade" id="insertModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document">
@@ -135,7 +134,7 @@
         <script src="http://code.jquery.com/jquery-latest.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script> 
         <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
-        <script src="bookWepApp.js"></script>
+        <script src="resources/js/bookWepApp.js"></script>
 
     </body>
 </html>

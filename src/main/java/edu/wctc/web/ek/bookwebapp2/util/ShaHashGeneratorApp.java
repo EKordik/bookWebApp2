@@ -28,6 +28,9 @@ public class ShaHashGeneratorApp {
         password = "testmgr"; // password field in db
         System.out.println(password + ": " + sha512(password,salt));
 
+        salt = "admin@isp.com";
+        password = "admin";
+        System.out.println(password + ": " + sha512(password, salt));
     }
 
     public static String sha512(String pwd, String salt) {

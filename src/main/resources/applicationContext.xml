@@ -59,7 +59,7 @@
         
         <sec:intercept-url 
             pattern="/**" 
-            access="hasAnyRole('ROLE_USER', 'ROLE_MGR')" requires-channel="https" />
+            access="hasAnyRole('ROLE_USER', 'ROLE_MGR', 'ROLE_ADMIN')" requires-channel="https" />
     
         <!-- Use custom form for login -->
         <sec:form-login 
@@ -76,7 +76,7 @@
                     delete-cookies="JSESSIONID"
                     logout-success-url="/login.jsp" />
         
-        <sec:csrf disabled="false"/>
+        <sec:csrf disabled="true"/>
         <!-- end Spring Security Config -->
 
     </sec:http>

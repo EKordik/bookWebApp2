@@ -35,7 +35,7 @@
                                 <form method="POST" action="BookController?action=list" class="indexForm">
                                     <button type="submit" class="btn btn-primary btnSpacing">View All Books</button>
                                 </form>
-                                <form method="POST" action="AuthorController?action=preference" class="indexForm">
+                                <form method="POST" action="PreferencesController?action=preference" class="indexForm">
                                     <button type="submit" class="btn btn-primary btnSpacing">Preferences</button>
                                 </form>
                                 
@@ -47,7 +47,7 @@
                                 <form method="POST" action="BookController?action=list" class="indexForm">
                                     <button type="submit" class="btn btn-primary btnSpacing">View All Books</button>
                                 </form>
-                                <form method="POST" action="AuthorController?action=preference" class="indexForm">
+                                <form method="POST" action="PreferencesController?action=preference" class="indexForm">
                                     <button type="submit" class="btn ${btnClass} btnSpacing">Preferences</button>
                                 </form>
                                 </c:otherwise>
@@ -55,11 +55,11 @@
                 </div>
             </div>
             
-             <sec:authorize access="hasAnyRole('ROLE_MGR','ROLE_USER')">
-                Logged in as: <sec:authentication property="principal.username"></sec:authentication> ::
-                <a href='<%= this.getServletContext().getContextPath() + "/j_spring_security_logout"%>'>Log Me Out</a>
-            </sec:authorize>   
+             
         </div>
+        
+        <jsp:include page="footer.jsp"/> 
+        
         <script src="http://code.jquery.com/jquery-latest.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script> 
     </body>

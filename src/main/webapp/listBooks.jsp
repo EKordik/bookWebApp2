@@ -33,13 +33,16 @@
                             <sec:csrfInput />
                             <button type="submit" class="btn ${btnClass} btnSpacing">Home</button>
                         </form>
+                            <sec:authorize access="hasAnyRole('ROLE_MGR', 'ROLE_ADMIN')">
                         <form method="POST" action="BookController?action=updateAdd">
                             <sec:csrfInput />
                             <button type="submit" class="btn ${btnClass} btnSpacing" data-toggle="modal">Add Book</button>
                         </form>
+                            </sec:authorize>
                     </div>
                 </nav>
                 <div class="col-xs-9">
+                    <sec:authorize access="hasAnyRole('ROLE_MGR', 'ROLE_ADMIN')">
                     <form method="POST" action="BookController?action=showByAuthor" class="form-inline bookForm">
                         <sec:csrfInput />
                         <input type="text" name="searchAuthor" id="searchAuthor" placeholder="Search Term" class="form-control">
@@ -105,19 +108,18 @@
                             ${errMsg}</p>
                         </div>
                         </c:if>
+                    </sec:authorize>
                 </div>
+                        
             </div>
-             <sec:authorize access="hasAnyRole('ROLE_MGR','ROLE_USER')">
-                Logged in as: <sec:authentication property="principal.username"></sec:authentication> ::
-                <a href='<%= this.getServletContext().getContextPath() + "/j_spring_security_logout"%>'>Log Me Out</a>
-            </sec:authorize>   
             
         </div>
 
+        <jsp:include page="footer.jsp"/>
+                        
         <script src="http://code.jquery.com/jquery-latest.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script> 
-        <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
-        <script src="bookWepApp.js"></script>
+
        
     </body>
 </html>
