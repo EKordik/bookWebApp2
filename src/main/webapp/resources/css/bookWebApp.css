@@ -41,6 +41,10 @@ td{
     padding-right: 3px;
 }
 
+.highlight{
+    background-color: #ccffff;
+}
+
 .bookForm{
     margin-bottom: 10px;
     float: right;

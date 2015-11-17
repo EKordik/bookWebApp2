@@ -27,11 +27,13 @@
             <div class="row">
                 <div class="col-xs-4"></div>
                 <div class="col-xs-8">
-                        <c:choose>
-                            <c:when test="${empty btnClass}">
+
                                 <form method="POST" action="AuthorController?action=list" class="indexForm">
                                     <button type="submit" class="btn btn-primary btnSpacing">View All Authors</button>
                                 </form>
+                    <div class="indexForm">
+                              <a href="listAuthorAjax.jsp" class="btn btn-primary btnSpacing">View All Authors (Ajax)</a>
+                    </div>
                                 <form method="POST" action="BookController?action=list" class="indexForm">
                                     <button type="submit" class="btn btn-primary btnSpacing">View All Books</button>
                                 </form>
@@ -39,19 +41,6 @@
                                     <button type="submit" class="btn btn-primary btnSpacing">Preferences</button>
                                 </form>
                                 
-                                </c:when>
-                                <c:otherwise>
-                                <form method="POST" action="AuthorController?action=list" class="indexForm">
-                                    <button type="submit" class="btn ${btnClass} btnSpacing">View All Authors</button>
-                                </form>
-                                <form method="POST" action="BookController?action=list" class="indexForm">
-                                    <button type="submit" class="btn btn-primary btnSpacing">View All Books</button>
-                                </form>
-                                <form method="POST" action="PreferencesController?action=preference" class="indexForm">
-                                    <button type="submit" class="btn ${btnClass} btnSpacing">Preferences</button>
-                                </form>
-                                </c:otherwise>
-                            </c:choose>    
                 </div>
             </div>
             
@@ -60,7 +49,7 @@
         
         <jsp:include page="footer.jsp"/> 
         
-        <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+        <script src="https://code.jquery.com/jquery-latest.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script> 
     </body>
 </html>

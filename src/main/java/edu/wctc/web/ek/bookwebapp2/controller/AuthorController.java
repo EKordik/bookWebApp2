@@ -4,11 +4,16 @@ package edu.wctc.web.ek.bookwebapp2.controller;
 import edu.wctc.web.ek.bookwebapp2.entity.Author;
 import edu.wctc.web.ek.bookwebapp2.service.AuthorService;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -44,6 +49,8 @@ public class AuthorController extends HttpServlet {
     private static final String UPDATE_FIND_ACTION = "findUpdate";
     private static final String UPDATE_PAGE = "/editAuthor.jsp";
     private static final String HOME_ACTION = "home";
+    private static final String AJAX_FIND_ALL_ACTION = "ajaxFindAll";
+    private static final String AJAX_FIND_BY_ID_ACTION = "ajaxFindByID";
 
 
         
@@ -65,7 +72,7 @@ public class AuthorController extends HttpServlet {
         WebApplicationContext ctx = 
                 WebApplicationContextUtils.getWebApplicationContext(sctx);
         AuthorService authorService = (AuthorService) ctx.getBean("authorService");
-
+        PrintWriter out = response.getWriter();
         
         //Sets a default page
         String destination = LIST_PAGE;
@@ -85,6 +92,26 @@ public class AuthorController extends HttpServlet {
              Parameter
              */
             switch(action){
+                case AJAX_FIND_ALL_ACTION:
+                    List<Author> authors = authorService.findAll();
+                    JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
+                    
+                    authors.forEach((authorObj) -> {
+                        jsonArrayBuilder.add(Json.createObjectBuilder()
+                                .add("authorId", authorObj.getAuthorId())
+                                .add("authorName", authorObj.getAuthorName())
+                                .add("dateAdded", authorObj.getDateCreated().toString())
+                        );
+                    });
+                    
+                    JsonArray authorsJson = jsonArrayBuilder.build();
+                    response.setContentType("application/json");
+                    out.write(authorsJson.toString());
+                    out.flush();
+                    return;
+                    
+                case AJAX_FIND_BY_ID_ACTION:
+                    break;
                 case LIST_ACTION: 
                     refreshAuthorsList(request, authorService);
                     break;
